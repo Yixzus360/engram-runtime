@@ -62,7 +62,7 @@ a centered composer. Attention Composer, selected actions, and Procedure Cue
 become three compact modules directly below the composer. Run Record stays
 attached to the bottom edge.
 
-The supplied purple Engram mark is both the product logo and PNG favicon. It
+The supplied Engram mark is both the product logo and PNG favicon. It
 also appears inside the animated glass spheres. The empty-state core is a
 logo-free rotating atom. Context Lens turns token reduction into a visible arc
 inside Focus Packet. The background moves continuously behind translucent
