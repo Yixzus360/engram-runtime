@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import random
 import re
 import shutil
@@ -139,6 +140,18 @@ def append_jsonl(path: Path, row: dict[str, Any]) -> None:
         handle.flush()
 
 
+def append_jsonl_batch(path: Path, rows: list[dict[str, Any]]) -> None:
+    """Persist a complete comparison pair in one flushed write."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = "".join(
+        json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n" for row in rows
+    )
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(payload)
+        handle.flush()
+        os.fsync(handle.fileno())
+
+
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
     if not path.exists():
         return []
@@ -219,6 +232,48 @@ def select_complete_pairs(plan: list[PlannedRun], max_pairs: int | None) -> list
             break
     selected = set(pair_ids)
     return [item for item in plan if item.pair_id in selected]
+
+
+def ordered_plan_pairs(plan: list[PlannedRun]) -> list[list[PlannedRun]]:
+    grouped: dict[str, list[PlannedRun]] = {}
+    for item in plan:
+        grouped.setdefault(item.pair_id, []).append(item)
+    pairs = list(grouped.values())
+    for pair in pairs:
+        if len(pair) != 2 or {item.condition for item in pair} != {"baseline", "engram"}:
+            raise RuntimeError(f"Invalid comparison pair in plan: {pair[0].pair_id}")
+        if {item.pair_order for item in pair} != {1, 2}:
+            raise RuntimeError(f"Invalid pair order in plan: {pair[0].pair_id}")
+        pair.sort(key=lambda item: item.pair_order)
+    return pairs
+
+
+def completed_pair_ids(rows: list[dict[str, Any]]) -> set[str]:
+    """Accept resumable results only when every persisted pair is complete and runnable."""
+    seen_run_ids: set[str] = set()
+    grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in rows:
+        run_id = str(row["run_id"])
+        if run_id in seen_run_ids:
+            raise RuntimeError(f"Duplicate run in existing results: {run_id}")
+        seen_run_ids.add(run_id)
+        if int(row.get("run", {}).get("exit_code", 0)) != 0:
+            raise RuntimeError(
+                "Existing results contain an infrastructure failure. "
+                "Start a clean output directory."
+            )
+        grouped[str(row["pair_id"])].append(row)
+    completed: set[str] = set()
+    for pair_id, pair_rows in grouped.items():
+        if len(pair_rows) != 2 or {row["condition"] for row in pair_rows} != {
+            "baseline",
+            "engram",
+        }:
+            raise RuntimeError(
+                f"Existing results contain an incomplete comparison pair: {pair_id}"
+            )
+        completed.add(pair_id)
+    return completed
 
 
 def result_record(item: PlannedRun, result: RunResult, price: ModelPrice) -> dict[str, Any]:
@@ -439,7 +494,8 @@ def run_plan(
         raise RuntimeError("Run plan changed after the study was locked")
     write_jsonl(plan_path, plan_rows)
     results_path = output_dir / "results.jsonl"
-    completed_ids = {row["run_id"] for row in read_jsonl(results_path)}
+    completed_pairs = completed_pair_ids(read_jsonl(results_path))
+    failures_path = output_dir / "failures.jsonl"
     tasks = {
         task.id: task for task in load_tasks(root / protocol["task_source"]["path"])
     }
@@ -453,30 +509,52 @@ def run_plan(
             json.dumps({"seconds": seconds, "workspace": workspace_slug}, indent=2) + "\n",
             encoding="utf-8",
         )
-    for item in selected:
-        if item.run_id in completed_ids:
+    for pair in ordered_plan_pairs(selected):
+        pair_id = pair[0].pair_id
+        if pair_id in completed_pairs:
             continue
-        capture_key = hashlib.sha256(item.run_id.encode("utf-8")).hexdigest()[:12]
-        capture_dir = output_dir / "r" / capture_key
-        if capture_dir.exists():
-            resolved_capture = capture_dir.resolve()
-            resolved_runs = (output_dir / "r").resolve()
-            if resolved_runs not in resolved_capture.parents:
-                raise RuntimeError(f"Refusing to reset capture outside {resolved_runs}")
-            shutil.rmtree(resolved_capture)
-        result = run_codex(
-            root=root,
-            task=tasks[item.task_id],
-            mode=item.condition,
-            model=item.model,
-            reasoning_effort=item.reasoning_effort,
-            workspace_slug=workspace_slug,
-            timeout_seconds=timeout_seconds,
-            capture_dir=capture_dir,
-            snapshot_name="w",
-            snapshot_source_root=source_snapshot,
-        )
-        append_jsonl(results_path, result_record(item, result, prices[item.model]))
+        pair_records: list[dict[str, Any]] = []
+        for item in pair:
+            capture_key = hashlib.sha256(item.run_id.encode("utf-8")).hexdigest()[:12]
+            capture_dir = output_dir / "r" / capture_key
+            if capture_dir.exists():
+                resolved_capture = capture_dir.resolve()
+                resolved_runs = (output_dir / "r").resolve()
+                if resolved_runs not in resolved_capture.parents:
+                    raise RuntimeError(f"Refusing to reset capture outside {resolved_runs}")
+                shutil.rmtree(resolved_capture)
+            result = run_codex(
+                root=root,
+                task=tasks[item.task_id],
+                mode=item.condition,
+                model=item.model,
+                reasoning_effort=item.reasoning_effort,
+                workspace_slug=workspace_slug,
+                timeout_seconds=timeout_seconds,
+                capture_dir=capture_dir,
+                snapshot_name="w",
+                snapshot_source_root=source_snapshot,
+            )
+            pair_records.append(result_record(item, result, prices[item.model]))
+            if result.exit_code != 0:
+                failed_at = datetime.now(UTC).isoformat()
+                append_jsonl_batch(
+                    failures_path,
+                    [
+                        {
+                            "failed_at": failed_at,
+                            "failure_scope": "pair_aborted",
+                            "trigger_run_id": item.run_id,
+                            "record": record,
+                        }
+                        for record in pair_records
+                    ],
+                )
+                raise RuntimeError(
+                    f"Infrastructure failure in {item.run_id} (exit {result.exit_code}). "
+                    f"The pair was excluded and recorded in {failures_path}."
+                )
+        append_jsonl_batch(results_path, pair_records)
 
 
 def parse_args() -> argparse.Namespace:

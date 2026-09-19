@@ -8,8 +8,10 @@ from engram_runtime.scientific_evaluation import (
     analyze_rows,
     api_equivalent_cost,
     build_plan,
+    completed_pair_ids,
     create_plan,
     ensure_study_lock,
+    ordered_plan_pairs,
     select_complete_pairs,
 )
 
@@ -52,6 +54,45 @@ def test_pair_limit_never_splits_a_pair() -> None:
     selected = select_complete_pairs(plan, 3)
     assert len(selected) == 6
     assert len({item.pair_id for item in selected}) == 3
+
+
+def test_plan_pairs_preserve_randomized_execution_order() -> None:
+    plan = build_plan(
+        tasks=[task()],
+        models=["model-a"],
+        reasoning_effort="high",
+        repetitions=3,
+        seed=7,
+    )
+    pairs = ordered_plan_pairs(plan)
+    assert len(pairs) == 3
+    assert all([item.pair_order for item in pair] == [1, 2] for pair in pairs)
+
+
+def test_resume_rejects_an_incomplete_pair() -> None:
+    rows = [
+        {
+            "run_id": "p1__baseline",
+            "pair_id": "p1",
+            "condition": "baseline",
+            "run": {"exit_code": 0},
+        }
+    ]
+    with pytest.raises(RuntimeError, match="incomplete comparison pair"):
+        completed_pair_ids(rows)
+
+
+def test_resume_accepts_only_complete_successful_pairs() -> None:
+    rows = [
+        {
+            "run_id": f"p1__{condition}",
+            "pair_id": "p1",
+            "condition": condition,
+            "run": {"exit_code": 0},
+        }
+        for condition in ("baseline", "engram")
+    ]
+    assert completed_pair_ids(rows) == {"p1"}
 
 
 def test_api_equivalent_uses_uncached_cached_and_output_rates() -> None:
