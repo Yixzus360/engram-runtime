@@ -72,9 +72,14 @@ and sanitized result are stored under [`benchmarks/codex/`](../benchmarks/codex/
   `2cc8c540bdb87fe6761629b585e727e1c4704520` and serializes trajectory evidence
   without benchmark-private answer or evaluator fields.
 
-These checks validate the evaluation machinery. The 250-run pilot and official
-external benchmark collection remain separate result-producing operations and
-must not be represented as completed evidence until their artifacts exist.
+These checks validate the evaluation machinery. The 250-run internal pilot is
+now complete: 125 intact pairs, 250 executions, no duplicate run IDs, no
+nonzero exits, and no infrastructure failure included in analysis. Completion
+was 110/125 without Engram and 125/125 with Engram (exact McNemar p=0.000061).
+The sanitized result and its claim boundary are recorded in
+[`benchmarks/scientific/latest-pilot.md`](../benchmarks/scientific/latest-pilot.md).
+Official external benchmark evidence remains a separate result-producing
+operation and must not be represented as complete until those artifacts exist.
 
 A five-model, one-task smoke test then completed all ten scheduled executions:
 5/5 baseline and 5/5 Engram. Engram reduced uncached input by 16.2%, output by

@@ -185,6 +185,13 @@ OFF/ON pair, supports
 checkpointed resume, and reports exact McNemar and paired bootstrap/sign-flip
 statistics. Its five-repetition pilot contains 125 pairs and 250 runs.
 
+That pilot is now complete. Engram improved paired completion from 110/125 to
+125/125 (exact McNemar p=0.000061) while reducing aggregate uncached input by
+17.8%, output by 20.6%, wall time by 14.6%, and tool calls by 24.5%. The gain in
+completion was concentrated in one internal task, so this is evidence for the
+locked task set rather than a general claim. See the
+[`full pilot result`](benchmarks/scientific/latest-pilot.md).
+
 ```powershell
 uv run engram-science plan
 uv run engram-science run --max-pairs 1

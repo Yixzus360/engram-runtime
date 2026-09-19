@@ -25,6 +25,21 @@ confirmatory target is ten repetitions after the external task sets are pinned.
 Codex Spark is absent by design. Preflight reported that it was unavailable to
 Codex with this ChatGPT account, and it was excluded before scored collection.
 
+## Completed internal pilot
+
+The preregistered five-repetition pilot completed all 250 executions as 125
+intact OFF/ON pairs with no infrastructure failure included in analysis.
+Completion rose from 110/125 without Engram to 125/125 with Engram, a paired
+difference of +12.0 percentage points (bootstrap 95% CI +6.4 to +17.6; exact
+McNemar p=0.000061). Engram also reduced aggregate uncached input by 17.8%,
+output by 20.6%, wall time by 14.6%, and tool calls by 24.5%.
+
+The completion difference was concentrated in one of the five internal tasks,
+so this remains an instrumentation pilot rather than evidence of broad
+generalization. The full sanitized result, per-model completion, statistical
+tests, and limitations are in
+[`benchmarks/scientific/latest-pilot.md`](../benchmarks/scientific/latest-pilot.md).
+
 ## Reproducible commands
 
 Create the full pilot plan without calling a model:
@@ -33,8 +48,9 @@ Create the full pilot plan without calling a model:
 uv run engram-science plan
 ```
 
-Run a checkpointed pilot. Every finished JSONL record is flushed immediately;
-running the same command again skips completed run IDs:
+Run a checkpointed pilot. Each complete OFF/ON pair is flushed atomically;
+running the same command again skips completed pairs and refuses incomplete or
+failed persisted results:
 
 ```powershell
 uv run engram-science run --timeout 600
