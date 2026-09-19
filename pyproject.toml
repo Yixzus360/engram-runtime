@@ -1,11 +1,18 @@
 [project]
 name = "engram-runtime"
 version = "0.1.0"
-description = "Local-first model-neutral runtime with durable experience"
+description = "Local-first AI runtime with compact context and reusable execution experience"
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "Apache-2.0" }
-authors = [{ name = "Engram Runtime contributors" }]
+authors = [{ name = "Yixzus360" }]
+keywords = ["ai-agents", "local-first", "model-routing", "ollama", "openai", "pgvector"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+]
 dependencies = [
   "fastembed>=0.7,<1",
   "fastapi>=0.116,<1",
@@ -18,6 +25,11 @@ dependencies = [
   "pydantic-settings>=2.10,<3",
   "uvicorn[standard]>=0.35,<1",
 ]
+
+[project.urls]
+Homepage = "https://github.com/Yixzus360/engram-runtime"
+Repository = "https://github.com/Yixzus360/engram-runtime"
+Issues = "https://github.com/Yixzus360/engram-runtime/issues"
 
 [project.optional-dependencies]
 universal = ["litellm>=1.80,<2"]
