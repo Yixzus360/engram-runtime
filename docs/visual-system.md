@@ -54,9 +54,14 @@ not reuse the site's commercial layout, copy, media, or page composition.
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
-The memorable element is a slowly refracting signal field behind the Active
-Frame. It responds to runtime activity and becomes still when the system is
-idle. Other surfaces remain quiet so operational information stays legible.
+The workspace is one continuous instrument surface. Run Journal, Active Frame,
+and Context Lens are regions separated by fine rules and material shifts, not
+independent floating cards. At tablet widths, Context Lens continues below the
+main work area; on mobile, all three regions become one vertical reading path.
+
+The memorable element is the Context Lens: an orbital instrument that turns
+token reduction into a visible arc. A slowly refracting signal field runs
+behind the Active Frame. Other regions stay quiet so execution remains legible.
 
 ## Interaction
 

@@ -22,6 +22,7 @@ const els = {
   sideEffects: $("#allow-side-effects"),
   tokenInput: $("#token-input"),
   tokenSaved: $("#token-saved"),
+  tokenLens: $(".token-lens"),
   actionCount: $("#action-count"),
   actionChips: $("#action-chips"),
   procedureState: $("#procedure-state"),
@@ -88,9 +89,9 @@ function showToast(message, error = false, retry = null) {
 
 function renderHealth(health) {
   const items = [
-    ["STATE CORE", health.state_core],
-    ["OLLAMA", health.ollama],
-    ["OPENAI KEY", health.openai_key],
+    ["State Core", health.state_core],
+    ["Ollama", health.ollama],
+    ["OpenAI", health.openai_key],
   ];
   els.health.innerHTML = items.map(([label, ready]) =>
     `<span class="health-pill ${ready ? "ready" : ""}"><i></i>${label}</span>`
@@ -100,7 +101,7 @@ function renderHealth(health) {
 function renderProfiles(profiles) {
   const previous = els.profile.value || "local";
   els.profile.innerHTML = profiles.map((profile) =>
-    `<option value="${escapeHtml(profile.name)}">${escapeHtml(profile.name.toUpperCase())} · ${escapeHtml(profile.model)}</option>`
+    `<option value="${escapeHtml(profile.name)}">${escapeHtml(profile.name[0].toUpperCase() + profile.name.slice(1))} / ${escapeHtml(profile.model)}</option>`
   ).join("");
   if (profiles.some((profile) => profile.name === previous)) els.profile.value = previous;
 }
@@ -123,7 +124,7 @@ function renderStats(stats) {
   els.experienceCount.textContent = formatNumber(stats.experiences);
   els.procedureCount.textContent = formatNumber(stats.verified_procedures);
   els.outputCount.textContent = formatNumber(stats.stored_outputs);
-  els.runCount.textContent = `${formatNumber(stats.runs)} runs`;
+  els.runCount.textContent = `${formatNumber(stats.runs)} run${Number(stats.runs) === 1 ? "" : "s"}`;
   els.capacity.style.width = `${Math.min(100, 8 + Number(stats.runs || 0) * 2)}%`;
 }
 
@@ -131,14 +132,14 @@ function renderConversation(entries) {
   if (!entries.length) {
     els.conversation.innerHTML = `<div class="empty-state">
       <div class="empty-orbit"><span></span></div>
-      <div class="eyebrow">READY FOR A NEW SIGNAL</div>
+      <div class="eyebrow">Ready for a new signal</div>
       <h3>Direct the runtime.</h3>
       <p>Choose an inference profile, describe the outcome, and inspect every selected signal and action.</p>
     </div>`;
     return;
   }
   els.conversation.innerHTML = entries.map((entry) => `<article class="message ${escapeHtml(entry.speaker)}">
-    <div class="message-label">${entry.speaker === "operator" ? "OPERATOR" : "ENGRAM WORKER"}</div>
+    <div class="message-label">${entry.speaker === "operator" ? "You" : "Engram"}</div>
     <div class="message-body">${escapeHtml(entry.body)}</div>
     <div class="message-time">${formatTime(entry.created_at)}</div>
   </article>`).join("");
@@ -146,11 +147,12 @@ function renderConversation(entries) {
 }
 
 function recordLabel(kind) {
-  return kind.replaceAll("_", " ").toUpperCase();
+  const label = kind.replaceAll("_", " ");
+  return label[0].toUpperCase() + label.slice(1);
 }
 
 function renderRecords(records) {
-  els.recordCount.textContent = records.length ? `${records.length} EVENTS` : "NO EVENTS";
+  els.recordCount.textContent = records.length ? `${records.length} event${records.length === 1 ? "" : "s"}` : "No events";
   els.timeline.innerHTML = records.map((record, index) => {
     const hot = index === records.length - 1 || ["action_dispatch", "focus_packet", "pattern_distillation"].includes(record.record_kind);
     return `<div class="record-node ${hot ? "hot" : ""}" title="${escapeHtml(JSON.stringify(record.payload))}">
@@ -166,6 +168,7 @@ function renderFocus(records) {
   if (!record) {
     els.tokenInput.textContent = "—";
     els.tokenSaved.textContent = "—";
+    els.tokenLens.style.setProperty("--saved-angle", "0deg");
     els.actionCount.textContent = "0";
     els.actionChips.innerHTML = `<span class="muted-copy">Awaiting composition</span>`;
     els.procedureState.textContent = "NONE";
@@ -176,9 +179,12 @@ function renderFocus(records) {
   const packet = record.payload;
   els.tokenInput.textContent = formatNumber(packet.estimated_tokens);
   els.tokenSaved.textContent = formatNumber(packet.estimated_tokens_avoided);
+  const tokenTotal = Number(packet.estimated_tokens || 0) + Number(packet.estimated_tokens_avoided || 0);
+  const savedRatio = tokenTotal ? Number(packet.estimated_tokens_avoided || 0) / tokenTotal : 0;
+  els.tokenLens.style.setProperty("--saved-angle", `${Math.round(savedRatio * 360)}deg`);
   els.actionCount.textContent = String(packet.actions?.length || 0);
   els.actionChips.innerHTML = (packet.actions || []).map((action) => `<span class="chip">${escapeHtml(action)}</span>`).join("") || `<span class="muted-copy">No actions selected</span>`;
-  els.procedureState.textContent = packet.reused_procedure ? "REUSED" : "NEW";
+  els.procedureState.textContent = packet.reused_procedure ? "Reused" : "New";
   els.procedureCue.classList.toggle("active", packet.reused_procedure);
   els.procedureCue.innerHTML = packet.reused_procedure
     ? `<span class="procedure-icon">◆</span><p>A prior Procedure Cue replaced part of the raw history for this run.</p>`
@@ -188,7 +194,7 @@ function renderFocus(records) {
 function setRunState(status) {
   const normalized = status || "idle";
   els.runState.className = `state-badge ${normalized}`;
-  els.runState.innerHTML = `<i></i>${escapeHtml(normalized.toUpperCase())}`;
+  els.runState.innerHTML = `<i></i>${escapeHtml(normalized[0].toUpperCase() + normalized.slice(1))}`;
 }
 
 async function selectThread(threadId) {

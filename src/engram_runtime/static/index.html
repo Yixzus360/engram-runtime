@@ -9,20 +9,24 @@
   <link rel="stylesheet" href="/static/runtime.css">
 </head>
 <body>
-  <div class="ambient ambient-one"></div>
-  <div class="ambient ambient-two"></div>
+  <div class="scene" aria-hidden="true">
+    <div class="scene-grid"></div>
+    <div class="aurora aurora-blue"></div>
+    <div class="aurora aurora-violet"></div>
+    <div class="horizon-line"></div>
+  </div>
   <div class="app-shell">
     <header class="topbar glass-panel">
       <div class="brand-lockup">
         <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
         <div>
-          <div class="eyebrow">LOCAL INTELLIGENCE SYSTEM</div>
+          <div class="eyebrow">Local intelligence system</div>
           <div class="brand-name">Engram <strong>Runtime</strong></div>
         </div>
       </div>
 
       <div class="runtime-selector">
-        <label for="profile-select">INFERENCE PROFILE</label>
+        <label for="profile-select">Model route</label>
         <div class="select-wrap">
           <span class="signal-dot"></span>
           <select id="profile-select" aria-label="Inference profile"></select>
@@ -33,12 +37,12 @@
       <div class="health-strip" id="health-strip" aria-label="Runtime health"></div>
     </header>
 
-    <div class="workspace-grid">
-      <aside class="journal glass-panel">
+    <div class="workspace-grid workspace-surface">
+      <aside class="journal">
         <div class="panel-title-row">
           <div>
-            <div class="eyebrow">STATE CORE</div>
-            <h2>Run Journal</h2>
+            <div class="eyebrow">State Core</div>
+            <h2>Run journal</h2>
           </div>
           <button class="icon-button" id="new-thread" title="New task" aria-label="New task">
             <svg viewBox="0 0 20 20"><path d="M10 4v12M4 10h12"/></svg>
@@ -51,11 +55,13 @@
         </div>
       </aside>
 
-      <main class="active-frame glass-panel">
+      <main class="active-frame">
+        <div class="frame-refraction" aria-hidden="true"><i></i><i></i><i></i></div>
         <div class="frame-header">
-          <div>
-            <div class="eyebrow">ACTIVE FRAME</div>
+          <div class="frame-identity">
+            <div class="eyebrow"><span class="live-pip"></span>Active Frame</div>
             <h1 id="thread-title">New runtime task</h1>
+            <p>One bounded cycle, fully observable.</p>
           </div>
           <div class="frame-badges">
             <span class="mono-badge" id="thread-id">UNINITIALIZED</span>
@@ -65,8 +71,8 @@
 
         <section class="conversation" id="conversation">
           <div class="empty-state">
-            <div class="empty-orbit"><span></span></div>
-            <div class="eyebrow">READY FOR A NEW SIGNAL</div>
+            <div class="empty-orbit"><span></span><i></i><b></b></div>
+            <div class="eyebrow">Ready for a new signal</div>
             <h3>Direct the runtime.</h3>
             <p>Choose an inference profile, describe the outcome, and inspect every selected signal and action.</p>
           </div>
@@ -74,8 +80,8 @@
 
         <section class="record-strip" id="record-strip">
           <div class="record-heading">
-            <span class="eyebrow">RUN RECORD</span>
-            <span class="record-count" id="record-count">NO EVENTS</span>
+            <span class="eyebrow">Run record</span>
+            <span class="record-count" id="record-count">No events</span>
           </div>
           <div class="record-timeline" id="record-timeline"></div>
         </section>
@@ -100,23 +106,23 @@
       </main>
 
       <aside class="focus-rail">
-        <section class="focus-card glass-panel">
+        <section class="focus-card">
           <div class="panel-title-row compact">
             <div>
-              <div class="eyebrow">ATTENTION COMPOSER</div>
-              <h2>Focus Packet</h2>
+              <div class="eyebrow">Attention Composer</div>
+              <h2>Context lens</h2>
             </div>
-            <div class="packet-pulse"><span></span></div>
+            <div class="packet-pulse"><span></span><i></i></div>
           </div>
-          <div class="token-hero">
-            <div>
+          <div class="token-lens">
+            <div class="lens-orbit" aria-hidden="true"><i></i><i></i><i></i></div>
+            <div class="lens-core">
               <span class="metric-value" id="token-input">—</span>
-              <span class="metric-label">EST. INPUT</span>
+              <span class="metric-label">estimated input</span>
             </div>
-            <div class="token-divider"></div>
             <div class="saved-metric">
-              <span class="metric-value" id="token-saved">—</span>
-              <span class="metric-label">AVOIDED</span>
+              <span class="saved-spark"></span>
+              <span><strong id="token-saved">—</strong> tokens avoided</span>
             </div>
           </div>
           <div class="focus-section">
@@ -132,8 +138,8 @@
           </div>
         </section>
 
-        <section class="telemetry-card glass-panel">
-          <div class="eyebrow">DURABLE SIGNALS</div>
+        <section class="telemetry-card">
+          <div class="eyebrow">Durable signals</div>
           <div class="telemetry-grid">
             <div><strong id="experience-count">0</strong><span>Experience</span></div>
             <div><strong id="procedure-count">0</strong><span>Verified</span></div>
