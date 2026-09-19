@@ -59,6 +59,11 @@ uv run pytest
 Docker engine in WSL2. `scripts/use-local-state.ps1` selects the reachable
 address without persisting credentials or provider keys.
 
+Signal Index uses Ollama with `nomic-embed-text:v1.5` for local 768-dimensional
+embeddings. It fuses PostgreSQL full-text and vector rankings, then can refine
+the candidates locally with FastEmbed. The small Apache-2.0 refinement model is
+downloaded on first use and cached under `~/.cache/engram/models`.
+
 ## License
 
 Apache-2.0.
