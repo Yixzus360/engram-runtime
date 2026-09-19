@@ -22,6 +22,9 @@ class RuntimeSettings(BaseSettings):
     ollama_url: str = "http://localhost:11434"
     embedding_model: str = "nomic-embed-text:v1.5"
     reranker_model: str = "Xenova/ms-marco-MiniLM-L-6-v2"
+    openai_economy_model: str = "gpt-5.6-luna"
+    openai_balanced_model: str = "gpt-5.6-terra"
+    openai_frontier_model: str = "gpt-6-astra"
     workspace_slug: str = "local"
     output_inline_bytes: int = Field(default=900, ge=200, le=8_000)
     action_limit: int = Field(default=8, ge=1, le=40)

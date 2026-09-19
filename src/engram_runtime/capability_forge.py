@@ -128,6 +128,12 @@ class CapabilityForge:
         Draft202012Validator(action.output_contract).validate(output)
         return ActionReceipt(action=action_name, output=output, risk_level=action.risk_level)
 
+    def loaded_action(self, workspace_id: UUID, action_name: str) -> ActionUnit:
+        action = self._actions.get((workspace_id, action_name))
+        if action is None:
+            raise LookupError(f"Action Unit '{action_name}' is not loaded in this process.")
+        return action
+
     def select_actions(
         self,
         workspace_id: UUID,

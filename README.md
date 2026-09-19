@@ -64,6 +64,18 @@ embeddings. It fuses PostgreSQL full-text and vector rankings, then can refine
 the candidates locally with FastEmbed. The small Apache-2.0 refinement model is
 downloaded on first use and cached under `~/.cache/engram/models`.
 
+The Inference Gateway includes native Ollama and OpenAI Responses adapters. An
+optional open-source LiteLLM bridge adds Claude, Gemini, hosted Llama,
+OpenRouter, and other providers behind the same Action Cycle:
+
+```powershell
+uv sync --extra universal
+```
+
+The default inference profiles are `local`, `economy` (GPT-5.6 Luna),
+`balanced` (GPT-5.6 Terra), and `frontier` (GPT-6 Astra). Model identifiers are
+environment-configurable, so account access and provider choice remain local.
+
 ## License
 
 Apache-2.0.
