@@ -23,7 +23,7 @@ private origin.
 ## 4. Experience Ledger
 
 - Active Frame, Knowledge Map, Run Journal, Procedure Vault, and retention rules.
-- Gate: write, recall, supersession, isolation, and deletion tests.
+- Gate: write, recall, supersession, isolation, and expiration tests.
 
 ## 5. Capability Forge
 
@@ -45,4 +45,3 @@ private origin.
 - Local web interface for conversations, runs, records, stored outputs, procedure candidates,
   provider profiles, and usage comparison.
 - Gate: end-to-end browser verification in local and optional hosted-inference modes.
-
