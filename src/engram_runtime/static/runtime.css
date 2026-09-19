@@ -211,7 +211,7 @@ h2 { margin: 5px 0 0; font-size: 23px; font-weight: 220; letter-spacing: -.055em
 .empty-state p { margin: 0; color: #8ba2b8; font-size: 12px; }
 .empty-orbit { width: 118px; height: 118px; position: relative; display: grid; place-items: center; border: 1px solid rgba(88,220,255,.18); border-radius: 50%; background: radial-gradient(circle, rgba(88,220,255,.1), transparent 62%); box-shadow: 0 0 62px rgba(39,124,255,.18), inset 0 0 46px rgba(145,100,255,.07); }
 .empty-orbit::before { content: ""; position: absolute; inset: 10px; border: 1px dashed rgba(88,220,255,.11); border-radius: 50%; animation: spin 28s linear infinite reverse; }
-.atom-nucleus { width: 17px; height: 17px; position: relative; z-index: 3; border: 1px solid rgba(218,246,255,.7); border-radius: 50%; background: radial-gradient(circle at 35% 30%, #f7fdff, var(--cyan) 26%, var(--blue) 58%, rgba(145,100,255,.8)); box-shadow: 0 0 15px rgba(88,220,255,.9), 0 0 32px rgba(39,124,255,.48); animation: nucleus-pulse 2.8s ease-in-out infinite; }
+.atom-nucleus { width: 19px; height: 19px; position: relative; z-index: 3; background: url("/static/engram-logo.png?v=11") center / contain no-repeat; filter: brightness(1.18) drop-shadow(0 0 6px rgba(88,220,255,.95)) drop-shadow(0 0 14px rgba(39,124,255,.62)); animation: nucleus-pulse 2.8s ease-in-out infinite; }
 .atom-ring { position: absolute; inset: 31px 9px; border: 1px solid rgba(126,211,255,.44); border-radius: 50%; transform-origin: center; }
 .atom-ring i { position: absolute; width: 7px; height: 7px; left: 50%; top: -4px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 12px var(--cyan); }
 .atom-ring-one { animation: atom-one 7s linear infinite; }

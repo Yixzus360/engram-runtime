@@ -62,9 +62,9 @@ a centered composer. Attention Composer, selected actions, and Procedure Cue
 become three compact modules directly below the composer. Run Record stays
 attached to the bottom edge.
 
-The supplied Engram mark is both the product logo and PNG favicon. It
-also appears inside the animated glass spheres. The empty-state core is a
-logo-free rotating atom. Context Lens turns token reduction into a visible arc
+The supplied Engram mark is both the product logo and PNG favicon. It also
+appears inside the animated glass spheres and, at nucleus scale, in the center
+of the empty-state atom. Context Lens turns token reduction into a visible arc
 inside Focus Packet. The background moves continuously behind translucent
 surfaces and stops under reduced-motion preferences.
 
