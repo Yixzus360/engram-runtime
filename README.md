@@ -1,0 +1,47 @@
+# Engram Runtime
+
+Engram Runtime is a local-first, model-neutral execution system with durable
+experience. It combines provider-independent inference, bounded action
+execution, hybrid knowledge discovery, and evidence-gated procedure reuse in
+one inspectable runtime.
+
+The control plane runs on open-source components. Inference can remain local or
+use an optional external provider such as OpenAI, Anthropic, Gemini, or any
+OpenAI-compatible endpoint.
+
+## Product language
+
+Engram Runtime uses its own public vocabulary. The canonical definitions live
+in [`docs/engram-lexicon.md`](docs/engram-lexicon.md).
+
+| Component | Responsibility |
+| --- | --- |
+| Inference Gateway | Normalizes local and hosted model providers. |
+| State Core | Persists runs, messages, outputs, and configuration. |
+| Signal Index | Finds relevant knowledge with lexical and vector signals. |
+| Experience Ledger | Preserves active, factual, historical, and procedural experience. |
+| Domain Lens | Grounds execution in project and organization knowledge. |
+| Capability Forge | Registers actions and distills verified procedures. |
+| Action Cycle | Runs bounded reason-action-observation cycles. |
+| Attention Composer | Builds compact Focus Packets for each inference call. |
+| Runtime Console | Makes execution, evidence, usage, and decisions visible. |
+
+## Development principles
+
+- Local operation is the default.
+- Hosted inference is optional.
+- Provider names never leak into domain logic.
+- Every side effect passes through a registered Action Unit.
+- Durable procedures require verification evidence.
+- Large outputs are anchored and retrieved only when needed.
+- The interface shows what the runtime selected and why.
+
+## Status
+
+Active development. The delivery sequence and acceptance gates are documented
+in [`docs/build-stages.md`](docs/build-stages.md).
+
+## License
+
+Apache-2.0.
+
