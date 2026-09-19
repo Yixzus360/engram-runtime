@@ -176,6 +176,33 @@ separately. This is an initial single-run result rather than a universal
 savings claim. See [`benchmarks/codex/latest-results.md`](benchmarks/codex/latest-results.md)
 for the full table and limitations.
 
+### Scientific evaluation track
+
+The expanded evaluator defines a randomized, paired matrix across GPT-5.5,
+GPT-5.6 Luna, Terra, Sol, and GPT-6 Astra. It holds model, effort, task,
+frozen snapshot, non-Engram tools, and budget constant inside every Engram
+OFF/ON pair, supports
+checkpointed resume, and reports exact McNemar and paired bootstrap/sign-flip
+statistics. Its five-repetition pilot contains 125 pairs and 250 runs.
+
+```powershell
+uv run engram-science plan
+uv run engram-science run --max-pairs 1
+uv run engram-science analyze
+uv run engram-debate --help
+```
+
+The internal tasks are an instrumentation pilot. The official external track
+starts with a pinned LongMemEval-V2 adapter and then adds execution, coding, and
+tool-use suites. See
+[`docs/scientific-benchmark.md`](docs/scientific-benchmark.md) and the
+[`preregistration`](benchmarks/scientific/preregistration.md) for the claim
+boundary, fixed hypotheses, metrics, exclusions, and stopping rule. The latest
+five-model harness check is published separately as a clearly labeled
+[`smoke test`](benchmarks/scientific/latest-smoke.md).
+The matching [`blind jury report`](benchmarks/scientific/latest-debate.md)
+keeps model critiques separate from the objective ON/OFF endpoint.
+
 ## Local stack
 
 - Python 3.12 and FastAPI for the runtime service.
@@ -261,6 +288,8 @@ uv sync --extra universal
 | [`tests/`](tests/) | Behavioral checks for isolation, retrieval, learning, gating, routing, and token composition. |
 | [`docs/`](docs/) | Architecture, vocabulary, visual contract, build stages, and verified evidence. |
 | [`benchmarks/codex/`](benchmarks/codex/) | Reproducible Codex tasks, scoring terms, and the latest paired result. |
+| [`benchmarks/scientific/`](benchmarks/scientific/) | Preregistered matrix, pinned external suites, prices, and statistical decision rules. |
+| [`benchmarks/adapters/`](benchmarks/adapters/) | Bridges to official third-party benchmark harnesses. |
 | [`.codex/config.toml`](.codex/config.toml) | Repository-scoped local MCP connection for Codex. |
 | [`scripts/`](scripts/) | PowerShell lifecycle scripts for local Windows and WSL2 development. |
 | [`compose.yaml`](compose.yaml) | Local PostgreSQL and pgvector service definition. |

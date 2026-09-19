@@ -7,7 +7,7 @@ Verified locally on 2026-09-19.
 ## Automated checks
 
 - Python lint: `uv run ruff check .` passed.
-- Test suite: `uv run pytest -q` passed all 27 tests, including workspace isolation, retrieval, procedure
+- Test suite: `uv run pytest -q` passed all 43 tests, including workspace isolation, retrieval, procedure
   verification, side-effect gating, bounded action execution, and Focus Packet
   composition, profile policy, MCP discovery, credential rejection, and benchmark parsing.
 - JavaScript syntax: `node --check` passed for the Runtime Console client.
@@ -57,6 +57,39 @@ general guarantee. Individual simple lookups sometimes used more total input
 with MCP, while multi-file procedure and safety questions benefited most. Raw
 event logs stay in ignored local artifacts; the reproducible task definitions
 and sanitized result are stored under [`benchmarks/codex/`](../benchmarks/codex/).
+
+## Scientific evaluation instrumentation
+
+- The frozen pilot plan contains 125 complete pairs and 250 executions across
+  five models, five tasks, and five repetitions.
+- Fixed-seed tests verify reproducible pair order and prevent `--max-pairs`
+  from splitting an Engram OFF/ON pair.
+- Statistical unit tests cover exact McNemar, paired bootstrap intervals, and
+  paired sign-flip randomization.
+- Cost tests separately record API list-price equivalent and unknown actual
+  subscription billing.
+- The LongMemEval-V2 adapter targets pinned commit
+  `2cc8c540bdb87fe6761629b585e727e1c4704520` and serializes trajectory evidence
+  without benchmark-private answer or evaluator fields.
+
+These checks validate the evaluation machinery. The 250-run pilot and official
+external benchmark collection remain separate result-producing operations and
+must not be represented as completed evidence until their artifacts exist.
+
+A five-model, one-task smoke test then completed all ten scheduled executions:
+5/5 baseline and 5/5 Engram. Engram reduced uncached input by 16.2%, output by
+6.0%, and tool calls by 14.3%; API list-price equivalent increased by 2.7% and
+wall time increased by 0.8%. With only five pairs and no completion discordance,
+the exact McNemar p-value is 1.0. These values validate the harness and remain
+explicitly non-confirmatory. The sanitized table is in
+[`benchmarks/scientific/latest-smoke.md`](../benchmarks/scientific/latest-smoke.md).
+
+The blind secondary jury accepted five of five schema-valid, no-tool verdicts.
+All five judges selected the same anonymized response, revealed after
+aggregation as GPT-6 Astra, while every candidate retained the same perfect
+objective score. The result is recorded in
+[`benchmarks/scientific/latest-debate.md`](../benchmarks/scientific/latest-debate.md)
+and is not merged into the primary endpoint.
 
 ## Interface checks
 

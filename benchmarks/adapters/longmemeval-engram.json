@@ -1,0 +1,8 @@
+{
+  "memory_type": "engram_runtime",
+  "memory_params": {
+    "workspace_slug": "longmemeval-v2-engram",
+    "top_k": 6,
+    "maximum_chunk_characters": 3500
+  }
+}

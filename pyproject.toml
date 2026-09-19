@@ -34,6 +34,14 @@ Issues = "https://github.com/Yixzus360/engram-runtime/issues"
 
 [project.optional-dependencies]
 universal = ["litellm>=1.80,<2"]
+longmemeval = [
+  "huggingface-hub>=0.34,<2",
+  "numpy>=2,<3",
+  "openai-agents>=0.3,<1",
+  "pillow>=11,<13",
+  "tqdm>=4.67,<5",
+  "transformers>=4.55,<6",
+]
 
 [dependency-groups]
 dev = [
@@ -46,6 +54,8 @@ dev = [
 engram = "engram_runtime.cli:main"
 engram-mcp = "engram_runtime.mcp_server:main"
 engram-benchmark = "engram_runtime.evaluation:main"
+engram-science = "engram_runtime.scientific_evaluation:main"
+engram-debate = "engram_runtime.blind_debate:main"
 
 [build-system]
 requires = ["hatchling"]

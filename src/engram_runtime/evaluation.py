@@ -191,7 +191,11 @@ def build_codex_command(
 def prepare_snapshot(root: Path, destination: Path) -> None:
     destination.mkdir(parents=True, exist_ok=False)
     for directory in ("src", "docs"):
-        shutil.copytree(root / directory, destination / directory)
+        shutil.copytree(
+            root / directory,
+            destination / directory,
+            ignore=shutil.ignore_patterns("__pycache__", "*.pyc"),
+        )
     for filename in ("README.md", "pyproject.toml", "LICENSE"):
         shutil.copy2(root / filename, destination / filename)
 
@@ -206,9 +210,11 @@ def run_codex(
     workspace_slug: str,
     timeout_seconds: int,
     capture_dir: Path,
+    snapshot_name: str | None = None,
+    snapshot_source_root: Path | None = None,
 ) -> RunResult:
-    snapshot = capture_dir / "workspaces" / f"{task.id}-{mode}"
-    prepare_snapshot(root, snapshot)
+    snapshot = capture_dir / (snapshot_name or f"workspaces/{task.id}-{mode}")
+    prepare_snapshot(snapshot_source_root or root, snapshot)
     command, _ = build_codex_command(
         workspace=snapshot,
         server_root=root,
