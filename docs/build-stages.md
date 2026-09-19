@@ -3,7 +3,7 @@
 Each stage ends with automated verification, a Git commit, and a push to the
 private origin.
 
-Status: all eight stages are complete for the local MVP.
+Status: all nine stages are complete for the local MVP.
 
 ## 1. Identity Contract
 
@@ -47,3 +47,11 @@ Status: all eight stages are complete for the local MVP.
 - Local web interface for conversations, runs, records, stored outputs, procedure candidates,
   provider profiles, and usage comparison.
 - Gate: end-to-end browser verification in local and optional hosted-inference modes.
+
+## 9. Agent Bridge and Evaluation
+
+- Local MCP server over standard input/output for Codex and compatible hosts.
+- Compact recall and evidence-backed persistence in an isolated workspace.
+- Deterministic provider-profile policy and locally persisted profile records.
+- Paired Codex evaluator with identical model, reasoning effort, task, and repository snapshot.
+- Gate: protocol discovery test, full automated suite, and five-task measured comparison.

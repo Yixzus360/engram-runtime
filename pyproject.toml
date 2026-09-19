@@ -24,6 +24,7 @@ dependencies = [
   "psycopg[binary,pool]>=3.2,<4",
   "pydantic-settings>=2.10,<3",
   "uvicorn[standard]>=0.35,<1",
+  "mcp>=2,<3",
 ]
 
 [project.urls]
@@ -43,6 +44,8 @@ dev = [
 
 [project.scripts]
 engram = "engram_runtime.cli:main"
+engram-mcp = "engram_runtime.mcp_server:main"
+engram-benchmark = "engram_runtime.evaluation:main"
 
 [build-system]
 requires = ["hatchling"]

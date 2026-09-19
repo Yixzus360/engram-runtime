@@ -7,9 +7,9 @@ Verified locally on 2026-09-19.
 ## Automated checks
 
 - Python lint: `uv run ruff check .` passed.
-- Test suite: `uv run pytest -q` passed all 19 tests, including workspace isolation, retrieval, procedure
+- Test suite: `uv run pytest -q` passed all 27 tests, including workspace isolation, retrieval, procedure
   verification, side-effect gating, bounded action execution, and Focus Packet
-  composition.
+  composition, profile policy, MCP discovery, credential rejection, and benchmark parsing.
 - JavaScript syntax: `node --check` passed for the Runtime Console client.
 - Distribution: `uv build` produced the source archive and wheel.
 - Packaging: Runtime Console assets, the local Inter variable font, and its SIL
@@ -22,11 +22,41 @@ Verified locally on 2026-09-19.
 - Ollama completed a real inference with `olmo-3:7b-instruct`.
 - OpenAI completed a real economy-profile inference and a two-turn `calculate`
   Action Unit cycle.
+- A fresh Codex execution loaded the repository-scoped `.codex/config.toml`,
+  discovered `runtime_status`, and received `codex-evaluation` with local State
+  Core ready.
 - The first matching successful action sequence created a candidate Procedure
   Pack; the second verified it; later matching runs retained verified status.
 - Procedure reuse reduced the composed Focus Packet from an estimated 438
   tokens to 259 and reduced selected action schemas from three to one. The
   estimated input avoided for that representative run was 179 tokens (41%).
+
+## Codex MCP evaluation
+
+A paired five-task run used `gpt-5.6-luna` with low reasoning. Every baseline
+and Engram execution received the same question and an isolated copy of the
+same repository. The Engram condition called one local recall tool and still
+had to verify the decisive claim in current files.
+
+| Aggregate | Baseline | Engram | Change |
+| --- | ---: | ---: | ---: |
+| Input tokens | 434,075 | 409,338 | -5.7% |
+| Cached input tokens | 370,432 | 360,960 | -2.6% |
+| Uncached input tokens | 63,643 | 48,378 | -24.0% |
+| Output tokens | 3,463 | 2,810 | -18.9% |
+| Elapsed inference time | 237.840 s | 187.096 s | -21.3% |
+| Tool calls | 16 | 12 | -25.0% |
+| Expected-answer terms | 14/15 | 15/15 | +1 term |
+
+Seeding the five verified local signals took 12.151 seconds and is excluded
+from the inference-time row so the acquisition cost remains visible. Including
+that one-time seed still leaves this run 38.593 seconds faster overall.
+
+The result is evidence for this task set, model, machine, and date. It is not a
+general guarantee. Individual simple lookups sometimes used more total input
+with MCP, while multi-file procedure and safety questions benefited most. Raw
+event logs stay in ignored local artifacts; the reproducible task definitions
+and sanitized result are stored under [`benchmarks/codex/`](../benchmarks/codex/).
 
 ## Interface checks
 
@@ -46,3 +76,6 @@ Verified locally on 2026-09-19.
   distributed job worker in this release.
 - Hosted model access depends on the operator's provider account, model access,
   network, and locally supplied environment variables.
+- Codex token counters include its host instructions, cached context, tool
+  schemas, and iterative tool turns. Repeat the benchmark before treating an
+  observed percentage as a pricing forecast.

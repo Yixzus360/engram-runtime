@@ -140,6 +140,42 @@ selected action schemas fell from three to one. These are measured local
 estimates for that run, not a universal savings claim. The evidence is recorded
 in [`docs/verification.md`](docs/verification.md).
 
+## Codex through MCP
+
+Engram can run as a local [Model Context Protocol](https://modelcontextprotocol.io/)
+server. In this mode, Codex remains the reasoning host and keeps the model the
+operator selected. Engram contributes only a compact, project-scoped memory
+packet and records validated outcomes for later work.
+
+The committed [`.codex/config.toml`](.codex/config.toml) starts the server over
+standard input/output for this repository. It exposes three bounded tools:
+
+| Tool | Purpose |
+| --- | --- |
+| `runtime_status` | Report local storage readiness and scoped memory counts. |
+| `recall_signals` | Return up to three concise signals relevant to one task. |
+| `preserve_signal` | Store one evidence-backed fact, decision, constraint, outcome, correction, or failure. |
+
+The bridge rejects likely credentials, caps input and output sizes, labels
+writes for the host, and uses the isolated `codex-evaluation` workspace. Start
+a new Codex task from this repository after changing MCP configuration so the
+host can load the project server.
+
+The reproducible evaluator runs the same read-only task against isolated
+repository copies with the same model and reasoning effort:
+
+```powershell
+uv run engram-benchmark --mode both --model gpt-5.6-luna --reasoning low
+```
+
+In the first optimized five-task run, Engram reduced total input tokens by
+5.7%, uncached input by 24.0%, output by 18.9%, elapsed inference time by 21.3%,
+and repository tool calls by 25.0%. Expected-answer coverage increased from
+14/15 to 15/15. The local memory seed took 12.151 seconds and is reported
+separately. This is an initial single-run result rather than a universal
+savings claim. See [`benchmarks/codex/latest-results.md`](benchmarks/codex/latest-results.md)
+for the full table and limitations.
+
 ## Local stack
 
 - Python 3.12 and FastAPI for the runtime service.
@@ -224,6 +260,8 @@ uv sync --extra universal
 | [`src/engram_runtime/sql/`](src/engram_runtime/sql/) | Transactional State Core schema and pgvector indexes. |
 | [`tests/`](tests/) | Behavioral checks for isolation, retrieval, learning, gating, routing, and token composition. |
 | [`docs/`](docs/) | Architecture, vocabulary, visual contract, build stages, and verified evidence. |
+| [`benchmarks/codex/`](benchmarks/codex/) | Reproducible Codex tasks, scoring terms, and the latest paired result. |
+| [`.codex/config.toml`](.codex/config.toml) | Repository-scoped local MCP connection for Codex. |
 | [`scripts/`](scripts/) | PowerShell lifecycle scripts for local Windows and WSL2 development. |
 | [`compose.yaml`](compose.yaml) | Local PostgreSQL and pgvector service definition. |
 | [`.env.example`](.env.example) | Safe configuration template without credentials. |
@@ -231,9 +269,13 @@ uv sync --extra universal
 
 ## Current status
 
-The eight-stage local MVP is complete and verified. It includes State Core,
+The nine-stage local MVP is complete and verified. It includes State Core,
 Signal Index, Experience Ledger, Capability Forge, Action Cycle, Attention
 Composer, provider profiles, procedure learning, and the Runtime Console.
+
+The ninth stage adds a local MCP bridge, repository-scoped Codex configuration,
+and a paired evaluation harness. The bridge does not replace the host model or
+silently change its reasoning level.
 
 Current scope:
 

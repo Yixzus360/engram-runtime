@@ -1,0 +1,32 @@
+[
+  {
+    "id": "state-storage",
+    "question": "Which table stores durable experience, and which two search mechanisms support its retrieval? Answer in one sentence and cite the repository paths you used.",
+    "expected_terms": ["engram_experience", "tsvector|full-text|lexical", "vector"],
+    "memory": "Durable experience is stored in engram_experience. Retrieval combines the generated search_document tsvector index with a pgvector HNSW embedding index. Source: src/engram_runtime/sql/001_state_core.sql and src/engram_runtime/signal_index.py."
+  },
+  {
+    "id": "model-routing",
+    "question": "For a routine request, an architecture audit, and a local-only request, which routing tiers does the deterministic profile policy prefer? Answer as three short mappings and cite the implementation path.",
+    "expected_terms": ["economy", "frontier", "local"],
+    "memory": "The deterministic profile policy prefers economy for routine work, frontier for architecture or security audits, and local for a local-only boundary. Source: src/engram_runtime/profiles.py choose_profile."
+  },
+  {
+    "id": "procedure-verification",
+    "question": "When does a procedure candidate become verified, and what evidence prevents one run from being counted twice? Answer in two sentences and cite the implementation path.",
+    "expected_terms": ["successful", "run", "verified"],
+    "memory": "A procedure becomes verified after the configured threshold of distinct successful run IDs; the default threshold is two. add_verification stores IDs in successful_run_ids and deduplicates them before counting. Source: src/engram_runtime/capability_forge.py."
+  },
+  {
+    "id": "action-safety",
+    "question": "Name the three controls that stop an untrusted model from freely executing side effects in the Action Cycle. Answer as a compact numbered list and cite the implementation paths.",
+    "expected_terms": ["selected", "schema", "gate"],
+    "memory": "Action safety has three principal controls: only actions selected in the Focus Packet may run, inputs are validated against JSON Schema, and write/external actions require the Operator Gate. Dispatch, duration, and repetition budgets add bounds. Source: src/engram_runtime/action_cycle.py and src/engram_runtime/capability_forge.py."
+  },
+  {
+    "id": "context-savings",
+    "question": "What measured repeated-run context reduction is documented for the local MVP, and why is it not a universal savings claim? Answer in one sentence and cite the evidence path.",
+    "expected_terms": ["438", "259", "41%|41 percent"],
+    "memory": "The verified representative repeated run fell from an estimated 438 tokens to 259, avoiding 179 tokens or 41 percent. It is a measured local example rather than a universal claim. Source: docs/verification.md and README.md."
+  }
+]
