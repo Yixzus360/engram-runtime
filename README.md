@@ -42,8 +42,10 @@ the established deep-blue glass material system.
 
 ## Status
 
-Active development. The delivery sequence and acceptance gates are documented
-in [`docs/build-stages.md`](docs/build-stages.md).
+The local MVP is complete across all eight delivery stages. Acceptance gates
+and the final verification record are documented in
+[`docs/build-stages.md`](docs/build-stages.md) and
+[`docs/verification.md`](docs/verification.md).
 
 ## Local development
 
@@ -58,6 +60,12 @@ uv run pytest
 `scripts/up.ps1` uses Docker directly when available and falls back to the
 Docker engine in WSL2. `scripts/use-local-state.ps1` selects the reachable
 address without persisting credentials or provider keys.
+
+Start the crystalline Runtime Console at `http://127.0.0.1:8765`:
+
+```powershell
+./scripts/run.ps1
+```
 
 Signal Index uses Ollama with `nomic-embed-text:v1.5` for local 768-dimensional
 embeddings. It fuses PostgreSQL full-text and vector rankings, then can refine

@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070b12">
+  <title>Engram Runtime</title>
+  <link rel="icon" href="/static/engram-mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/runtime.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="app-shell">
+    <header class="topbar glass-panel">
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div>
+          <div class="eyebrow">LOCAL INTELLIGENCE SYSTEM</div>
+          <div class="brand-name">Engram <strong>Runtime</strong></div>
+        </div>
+      </div>
+
+      <div class="runtime-selector">
+        <label for="profile-select">INFERENCE PROFILE</label>
+        <div class="select-wrap">
+          <span class="signal-dot"></span>
+          <select id="profile-select" aria-label="Inference profile"></select>
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg>
+        </div>
+      </div>
+
+      <div class="health-strip" id="health-strip" aria-label="Runtime health"></div>
+    </header>
+
+    <div class="workspace-grid">
+      <aside class="journal glass-panel">
+        <div class="panel-title-row">
+          <div>
+            <div class="eyebrow">STATE CORE</div>
+            <h2>Run Journal</h2>
+          </div>
+          <button class="icon-button" id="new-thread" title="New task" aria-label="New task">
+            <svg viewBox="0 0 20 20"><path d="M10 4v12M4 10h12"/></svg>
+          </button>
+        </div>
+        <div class="thread-list" id="thread-list"></div>
+        <div class="journal-footer">
+          <div class="capacity-line"><span>Local workspace</span><span id="run-count">0 runs</span></div>
+          <div class="capacity-track"><span id="capacity-fill"></span></div>
+        </div>
+      </aside>
+
+      <main class="active-frame glass-panel">
+        <div class="frame-header">
+          <div>
+            <div class="eyebrow">ACTIVE FRAME</div>
+            <h1 id="thread-title">New runtime task</h1>
+          </div>
+          <div class="frame-badges">
+            <span class="mono-badge" id="thread-id">UNINITIALIZED</span>
+            <span class="state-badge idle" id="run-state"><i></i>IDLE</span>
+          </div>
+        </div>
+
+        <section class="conversation" id="conversation">
+          <div class="empty-state">
+            <div class="empty-orbit"><span></span></div>
+            <div class="eyebrow">READY FOR A NEW SIGNAL</div>
+            <h3>Direct the runtime.</h3>
+            <p>Choose an inference profile, describe the outcome, and inspect every selected signal and action.</p>
+          </div>
+        </section>
+
+        <section class="record-strip" id="record-strip">
+          <div class="record-heading">
+            <span class="eyebrow">RUN RECORD</span>
+            <span class="record-count" id="record-count">NO EVENTS</span>
+          </div>
+          <div class="record-timeline" id="record-timeline"></div>
+        </section>
+
+        <form class="composer" id="composer">
+          <div class="composer-field">
+            <textarea id="request-input" rows="3" maxlength="20000" placeholder="Describe the task or outcome…" required></textarea>
+            <div class="composer-meta">
+              <label class="gate-toggle">
+                <input type="checkbox" id="allow-side-effects">
+                <span class="toggle-track"><i></i></span>
+                <span>Allow workspace writes</span>
+              </label>
+              <span>Ctrl + Enter to run</span>
+            </div>
+          </div>
+          <button class="run-button" type="submit" id="run-button">
+            <span>Run cycle</span>
+            <svg viewBox="0 0 20 20"><path d="m7 4 7 6-7 6V4Z"/></svg>
+          </button>
+        </form>
+      </main>
+
+      <aside class="focus-rail">
+        <section class="focus-card glass-panel">
+          <div class="panel-title-row compact">
+            <div>
+              <div class="eyebrow">ATTENTION COMPOSER</div>
+              <h2>Focus Packet</h2>
+            </div>
+            <div class="packet-pulse"><span></span></div>
+          </div>
+          <div class="token-hero">
+            <div>
+              <span class="metric-value" id="token-input">—</span>
+              <span class="metric-label">EST. INPUT</span>
+            </div>
+            <div class="token-divider"></div>
+            <div class="saved-metric">
+              <span class="metric-value" id="token-saved">—</span>
+              <span class="metric-label">AVOIDED</span>
+            </div>
+          </div>
+          <div class="focus-section">
+            <div class="section-label"><span>Selected actions</span><b id="action-count">0</b></div>
+            <div class="chip-list" id="action-chips"><span class="muted-copy">Awaiting composition</span></div>
+          </div>
+          <div class="focus-section">
+            <div class="section-label"><span>Procedure cue</span><b id="procedure-state">NONE</b></div>
+            <div class="procedure-cue" id="procedure-cue">
+              <span class="procedure-icon">◇</span>
+              <p>The first successful action sequence will crystallize here.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="telemetry-card glass-panel">
+          <div class="eyebrow">DURABLE SIGNALS</div>
+          <div class="telemetry-grid">
+            <div><strong id="experience-count">0</strong><span>Experience</span></div>
+            <div><strong id="procedure-count">0</strong><span>Verified</span></div>
+            <div><strong id="output-count">0</strong><span>Outputs</span></div>
+          </div>
+          <div class="signal-map" aria-hidden="true">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            <span></span><span></span><span></span>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="/static/runtime.js" defer></script>
+</body>
+</html>

@@ -36,7 +36,8 @@ not reuse the site's commercial layout, copy, media, or page composition.
 - Strong glass: `rgba(16, 38, 61, 0.85)` with 24px backdrop blur.
 - Edge: one-pixel ice-blue border between 12% and 26% opacity.
 - Depth: broad dark shadow plus a restrained blue ambient glow.
-- Radius: 18px for work surfaces, 999px only for compact status controls.
+- Radius: 28px for primary work surfaces, 22px for nested panels, 16px for
+  controls, and 999px for pills, tags, and primary actions.
 - Reflection: a narrow top-edge highlight, never a full decorative gradient border.
 
 ## Runtime Console layout
@@ -59,9 +60,9 @@ idle. Other surfaces remain quiet so operational information stays legible.
 
 ## Interaction
 
-- Motion explains state changes; it is not continuous decoration.
+- Functional motion explains state changes. A separate ambient layer moves on
+  a restrained 58–64 second loop while all work surfaces remain stable.
 - A dispatch creates one short light pulse from Active Frame to Run Record.
 - Focus Packet changes crossfade in place without moving the layout.
 - Reduced-motion mode removes refraction and pulse animation.
 - Every interactive element has a visible keyboard focus state.
-

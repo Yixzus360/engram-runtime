@@ -81,11 +81,27 @@ class AttentionComposer:
             if float(item["relevance"]) >= self.procedure_relevance_floor
         ]
         all_actions = self.forge.list_actions(workspace_id)
-        selected_actions = self.forge.select_actions(
+        ranked_actions = self.forge.select_actions(
             workspace_id,
             request,
             limit=action_limit,
         )
+        selected_actions = ranked_actions
+        if procedures:
+            procedure_action_names: list[str] = []
+            for procedure in procedures:
+                for step in procedure["procedure_body"].get("steps", []):
+                    name = step.get("action")
+                    if name and name not in procedure_action_names:
+                        procedure_action_names.append(name)
+            actions_by_name = {action["name"]: action for action in all_actions}
+            procedure_actions = [
+                actions_by_name[name]
+                for name in procedure_action_names
+                if name in actions_by_name
+            ]
+            if procedure_actions:
+                selected_actions = procedure_actions[:action_limit]
         tools = tuple(
             GatewayTool(
                 name=action["name"],

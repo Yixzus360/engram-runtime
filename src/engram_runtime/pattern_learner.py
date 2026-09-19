@@ -32,7 +32,7 @@ class PatternLearner:
         candidates = self.forge.find_procedures(
             workspace_id,
             request,
-            statuses=("candidate",),
+            statuses=("candidate", "verified"),
             limit=1,
         )
         if candidates and float(candidates[0]["relevance"]) >= self.similarity_floor:

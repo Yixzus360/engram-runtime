@@ -8,9 +8,15 @@ from .state_core import StateCore
 
 def main() -> None:
     parser = argparse.ArgumentParser(prog="engram")
-    parser.add_argument("command", choices=("migrate", "health"))
+    parser.add_argument("command", choices=("migrate", "health", "serve"))
     args = parser.parse_args()
     settings = get_settings()
+    if args.command == "serve":
+        import uvicorn
+
+        uvicorn.run("engram_runtime.web:app", host="127.0.0.1", port=8765)
+        return
+
     core = StateCore(settings.database_url)
     core.open()
     try:

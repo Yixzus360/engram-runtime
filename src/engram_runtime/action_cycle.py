@@ -94,6 +94,7 @@ class ActionCycle:
         dispatches = 0
         usage = {"input_tokens": 0, "output_tokens": 0, "inference_calls": 0}
         repetitions: Counter[str] = Counter()
+        selected_action_names = {tool.name for tool in tools}
 
         try:
             turn = provider.start(instructions=instructions, prompt=request, tools=tools)
@@ -153,6 +154,15 @@ class ActionCycle:
                             usage,
                             f"repeated action blocked: {call.name}",
                         )
+                    if call.name not in selected_action_names:
+                        output = {"error": "action_not_selected", "action": call.name}
+                        self.core.emit_record(
+                            run["id"],
+                            "action_rejected",
+                            {"action": call.name, "reason": "not selected for this Focus Packet"},
+                        )
+                        outputs.append(GatewayOutput(call_id=call.call_id, content=output))
+                        continue
                     action = self.forge.loaded_action(workspace_id, call.name)
                     allowed = action.risk_level is RiskLevel.READ or (
                         self.operator_gate is not None

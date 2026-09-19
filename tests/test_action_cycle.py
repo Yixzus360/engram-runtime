@@ -184,3 +184,32 @@ def test_repetition_guard_stops_loop(core: StateCore) -> None:
     assert result.status == "stopped"
     assert result.dispatches == 2
     assert "repeated action blocked" in result.answer
+
+
+def test_provider_cannot_invoke_unselected_action(core: StateCore) -> None:
+    workspace, thread, forge = cycle_fixture(core)
+    provider = ScriptedProvider(
+        [
+            GatewayTurn(
+                text="",
+                calls=(GatewayCall("unselected", "add", {"left": 1, "right": 2}),),
+            ),
+            GatewayTurn(text="The action was unavailable."),
+        ]
+    )
+
+    result = ActionCycle(core, forge).run(
+        workspace["id"],
+        thread["id"],
+        "Do not expose actions",
+        provider=provider,
+        instructions="Use selected actions only.",
+        tools=(),
+    )
+
+    assert result.status == "complete"
+    assert result.dispatches == 0
+    assert any(
+        record["record_kind"] == "action_rejected"
+        for record in core.list_records(result.run_id)
+    )

@@ -3,6 +3,8 @@
 Each stage ends with automated verification, a Git commit, and a push to the
 private origin.
 
+Status: all eight stages are complete for the local MVP.
+
 ## 1. Identity Contract
 
 - Canonical vocabulary and clean implementation rules.

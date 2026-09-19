@@ -141,13 +141,18 @@ def test_second_success_promotes_learned_procedure(core: StateCore) -> None:
     request = "echo the validated account marker"
     first = complete_action_run(core, thread["id"], request, "valid")
     second = complete_action_run(core, thread["id"], request, "valid")
+    third = complete_action_run(core, thread["id"], request, "valid")
 
     created = learner.observe_success(workspace["id"], first["id"], request)
     promoted = learner.observe_success(workspace["id"], second["id"], request)
+    retained = learner.observe_success(workspace["id"], third["id"], request)
 
     assert created.status == "candidate"
     assert promoted.status == "verified"
     assert promoted.created is False
+    assert retained.status == "verified"
+    assert retained.created is False
+    assert retained.procedure_id == promoted.procedure_id
 
 
 def test_large_action_output_is_anchored(core: StateCore) -> None:
