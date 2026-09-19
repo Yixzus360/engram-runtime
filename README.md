@@ -76,6 +76,12 @@ The default inference profiles are `local`, `economy` (GPT-5.6 Luna),
 `balanced` (GPT-5.6 Terra), and `frontier` (GPT-6 Astra). Model identifiers are
 environment-configurable, so account access and provider choice remain local.
 
+Successful action sequences are distilled into candidate Procedure Packs. A
+matching second run receives that compact procedure cue and, when it succeeds,
+promotes the procedure to verified. Attention Composer reports the estimated
+input size and avoided tokens for every Focus Packet. Large action results are
+stored once in State Core and only a bounded preview returns to the model.
+
 ## License
 
 Apache-2.0.

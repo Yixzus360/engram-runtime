@@ -157,6 +157,20 @@ class CapabilityForge:
             )
             return list(cursor.fetchall())
 
+    def list_actions(self, workspace_id: UUID) -> list[dict[str, Any]]:
+        with self.core.pool.connection() as connection, connection.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT id, name, description, input_contract, output_contract,
+                       handler, risk_level
+                  FROM engram_action_unit
+                 WHERE workspace_id = %s AND enabled = true
+                 ORDER BY name
+                """,
+                (workspace_id,),
+            )
+            return list(cursor.fetchall())
+
     def distill_candidate(
         self,
         workspace_id: UUID,
@@ -197,7 +211,7 @@ class CapabilityForge:
             body = {"steps": steps}
             evidence = {"successful_run_ids": [str(run_id)], "failed_run_ids": []}
             fingerprint = self._procedure_fingerprint(trigger_text, body)
-            embedding = self.encoder.encode([f"{trigger_text}\n{description}"])[0]
+            embedding = self.encoder.encode([trigger_text])[0]
             cursor.execute(
                 """
                 INSERT INTO engram_procedure_pack (
@@ -281,21 +295,39 @@ class CapabilityForge:
         *,
         limit: int = 3,
     ) -> list[dict[str, Any]]:
+        return self.find_procedures(
+            workspace_id,
+            request,
+            statuses=("verified",),
+            limit=limit,
+        )
+
+    def find_procedures(
+        self,
+        workspace_id: UUID,
+        request: str,
+        *,
+        statuses: Sequence[str] = ("verified", "candidate"),
+        limit: int = 3,
+    ) -> list[dict[str, Any]]:
+        allowed = {"candidate", "verified", "retired"}
+        if not statuses or not set(statuses) <= allowed:
+            raise ValueError("invalid procedure status filter")
         query_vector = self.encoder.encode([request])[0]
         with self.core.pool.connection() as connection, connection.cursor() as cursor:
             cursor.execute(
                 """
-                SELECT id, name, version, description, trigger_text,
+                SELECT id, name, version, status, description, trigger_text,
                        procedure_body, verification_evidence,
                        1 - (embedding <=> %s::vector) AS relevance
                   FROM engram_procedure_pack
                  WHERE workspace_id = %s
-                   AND status = 'verified'
+                   AND status = ANY(%s)
                    AND embedding IS NOT NULL
                  ORDER BY embedding <=> %s::vector, updated_at DESC
                  LIMIT %s
                 """,
-                (query_vector, workspace_id, query_vector, limit),
+                (query_vector, workspace_id, list(statuses), query_vector, limit),
             )
             return list(cursor.fetchall())
 

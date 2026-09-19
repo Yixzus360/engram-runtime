@@ -128,6 +128,23 @@ class StateCore:
             connection.commit()
             return row
 
+    def list_recent_entries(self, thread_id: UUID, *, limit: int = 20) -> list[dict[str, Any]]:
+        with self.pool.connection() as connection, connection.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT *
+                  FROM (
+                    SELECT * FROM engram_entry
+                     WHERE thread_id = %s
+                     ORDER BY sequence_no DESC
+                     LIMIT %s
+                  ) AS recent
+                 ORDER BY sequence_no
+                """,
+                (thread_id, limit),
+            )
+            return list(cursor.fetchall())
+
     def start_run(
         self, thread_id: UUID, request_text: str, inference_profile: str
     ) -> dict[str, Any]:

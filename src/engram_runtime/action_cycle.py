@@ -16,6 +16,7 @@ from .inference_gateway import (
     GatewayTurn,
     InferenceProvider,
 )
+from .pattern_learner import PatternLearner
 from .state_core import StateCore
 
 OperatorGate = Callable[[RiskLevel, str, dict[str, Any]], bool]
@@ -37,6 +38,7 @@ class CycleResult:
     usage: dict[str, int]
     provider: str
     model: str
+    procedure_status: str | None = None
 
 
 class ActionCycle:
@@ -49,11 +51,15 @@ class ActionCycle:
         *,
         limits: CycleLimits | None = None,
         operator_gate: OperatorGate | None = None,
+        learner: PatternLearner | None = None,
+        output_inline_bytes: int = 900,
     ) -> None:
         self.core = core
         self.forge = forge
         self.limits = limits or CycleLimits()
         self.operator_gate = operator_gate
+        self.learner = learner
+        self.output_inline_bytes = output_inline_bytes
 
     def run(
         self,
@@ -65,16 +71,18 @@ class ActionCycle:
         instructions: str,
         root_path: Path | None = None,
         action_limit: int = 8,
+        tools: tuple[GatewayTool, ...] | None = None,
     ) -> CycleResult:
-        selected = self.forge.select_actions(workspace_id, request, limit=action_limit)
-        tools = tuple(
-            GatewayTool(
-                name=item["name"],
-                description=item["description"],
-                parameters=item["input_contract"],
+        if tools is None:
+            selected = self.forge.select_actions(workspace_id, request, limit=action_limit)
+            tools = tuple(
+                GatewayTool(
+                    name=item["name"],
+                    description=item["description"],
+                    parameters=item["input_contract"],
+                )
+                for item in selected
             )
-            for item in selected
-        )
         run = self.core.start_run(thread_id, request, provider.provider_name)
         self.core.append_entry(thread_id, "operator", request)
         self.core.emit_record(
@@ -110,6 +118,12 @@ class ActionCycle:
                     self.core.finish_run(
                         run["id"], status="complete", outcome=answer, usage=usage
                     )
+                    procedure_status = self._learn(
+                        workspace_id,
+                        run["id"],
+                        request,
+                        dispatches,
+                    )
                     return CycleResult(
                         run_id=run["id"],
                         status="complete",
@@ -118,6 +132,7 @@ class ActionCycle:
                         usage=usage,
                         provider=provider.provider_name,
                         model=provider.model,
+                        procedure_status=procedure_status,
                     )
 
                 stop_reason = self._limit_reason(started_at, dispatches)
@@ -161,7 +176,12 @@ class ActionCycle:
                                 root_path=root_path,
                             ),
                         )
-                        output = receipt.output
+                        output = self._compact_output(
+                            workspace_id,
+                            run["id"],
+                            call.call_id,
+                            receipt.output,
+                        )
                         dispatches += 1
                         self.core.emit_record(
                             run["id"],
@@ -200,6 +220,60 @@ class ActionCycle:
         if time.monotonic() - started_at >= self.limits.max_duration_seconds:
             return "duration limit reached"
         return None
+
+    def _compact_output(
+        self,
+        workspace_id: UUID,
+        run_id: UUID,
+        dispatch_id: str,
+        output: Any,
+    ) -> Any:
+        serialized = json.dumps(output, default=str, ensure_ascii=False)
+        if len(serialized.encode("utf-8")) <= self.output_inline_bytes:
+            return output
+        anchored = self.core.anchor_output(
+            workspace_id,
+            serialized,
+            preview_bytes=self.output_inline_bytes,
+            run_id=run_id,
+            dispatch_id=dispatch_id,
+        )
+        return {
+            "stored_output_id": str(anchored.id),
+            "preview": anchored.preview,
+            "byte_count": anchored.byte_count,
+            "sha256": anchored.sha256,
+        }
+
+    def _learn(
+        self,
+        workspace_id: UUID,
+        run_id: UUID,
+        request: str,
+        dispatches: int,
+    ) -> str | None:
+        if self.learner is None or dispatches == 0:
+            return None
+        try:
+            receipt = self.learner.observe_success(workspace_id, run_id, request)
+            self.core.emit_record(
+                run_id,
+                "pattern_distillation",
+                {
+                    "procedure_id": str(receipt.procedure_id),
+                    "status": receipt.status,
+                    "created": receipt.created,
+                    "relevance": receipt.relevance,
+                },
+            )
+            return receipt.status
+        except Exception as error:
+            self.core.emit_record(
+                run_id,
+                "pattern_distillation_failed",
+                {"error": f"{type(error).__name__}: {error}"},
+            )
+            return None
 
     def _stop(
         self,
