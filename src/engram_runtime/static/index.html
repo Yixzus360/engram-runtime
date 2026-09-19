@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#070b12">
   <title>Engram Runtime</title>
-  <link rel="icon" href="/static/engram-mark.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/static/runtime.css">
+  <link rel="icon" href="/static/engram-logo.png?v=7" type="image/png">
+  <link rel="stylesheet" href="/static/runtime.css?v=7">
 </head>
 <body>
   <div class="scene" aria-hidden="true">
@@ -14,54 +14,75 @@
     <div class="aurora aurora-blue"></div>
     <div class="aurora aurora-violet"></div>
     <div class="horizon-line"></div>
+    <div class="orbit-path orbit-path-one"></div>
+    <div class="orbit-path orbit-path-two"></div>
+    <div class="energy-stream stream-one"></div>
+    <div class="energy-stream stream-two"></div>
+    <div class="signal-sphere sphere-one"><img src="/static/engram-logo.png" alt=""></div>
+    <div class="signal-sphere sphere-two"><img src="/static/engram-logo.png" alt=""></div>
   </div>
   <div class="app-shell">
-    <header class="topbar glass-panel">
-      <div class="brand-lockup">
-        <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
-        <div>
-          <div class="eyebrow">Local intelligence system</div>
-          <div class="brand-name">Engram <strong>Runtime</strong></div>
-        </div>
-      </div>
-
-      <div class="runtime-selector">
-        <label for="profile-select">Model route</label>
-        <div class="select-wrap">
-          <span class="signal-dot"></span>
-          <select id="profile-select" aria-label="Inference profile"></select>
-          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg>
-        </div>
-      </div>
-
-      <div class="health-strip" id="health-strip" aria-label="Runtime health"></div>
-    </header>
-
-    <div class="workspace-grid workspace-surface">
+    <div class="workspace-shell">
       <aside class="journal">
-        <div class="panel-title-row">
-          <div>
-            <div class="eyebrow">State Core</div>
-            <h2>Run journal</h2>
-          </div>
+        <div class="sidebar-actions">
+          <div class="sidebar-mark"><img src="/static/engram-logo.png" alt=""></div>
           <button class="icon-button" id="new-thread" title="New task" aria-label="New task">
             <svg viewBox="0 0 20 20"><path d="M10 4v12M4 10h12"/></svg>
           </button>
         </div>
+        <div class="journal-title">
+          <div class="eyebrow">State Core</div>
+          <h2>Run Journal</h2>
+        </div>
+        <label class="thread-search">
+          <span>Search runs</span>
+          <input id="thread-search" type="search" placeholder="Search">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m13 13 4 4"/></svg>
+        </label>
+        <div class="journal-heading">
+          <span>Recent</span>
+          <small id="run-count">0 runs</small>
+        </div>
         <div class="thread-list" id="thread-list"></div>
+        <div class="sidebar-telemetry">
+          <span class="eyebrow">Durable signals</span>
+          <div><strong id="experience-count">0</strong><span>Experience</span></div>
+          <div><strong id="procedure-count">0</strong><span>Verified</span></div>
+          <div><strong id="output-count">0</strong><span>Outputs</span></div>
+        </div>
         <div class="journal-footer">
-          <div class="capacity-line"><span>Local workspace</span><span id="run-count">0 runs</span></div>
+          <div class="capacity-line"><span>Local State Core</span><span>Ready</span></div>
           <div class="capacity-track"><span id="capacity-fill"></span></div>
         </div>
       </aside>
 
       <main class="active-frame">
         <div class="frame-refraction" aria-hidden="true"><i></i><i></i><i></i></div>
-        <div class="frame-header">
-          <div class="frame-identity">
+        <header class="runtime-head">
+          <div class="brand-lockup">
+            <div class="brand-mark" aria-hidden="true"><img src="/static/engram-logo.png" alt=""></div>
+            <div>
+              <div class="brand-name">Engram <strong>Runtime</strong></div>
+              <div class="eyebrow">Local intelligence system</div>
+            </div>
+          </div>
+          <div class="runtime-controls">
+            <div class="runtime-selector">
+              <label for="profile-select">Model route</label>
+              <div class="select-wrap">
+                <span class="signal-dot"></span>
+                <select id="profile-select" aria-label="Inference profile"></select>
+                <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg>
+              </div>
+            </div>
+            <div class="health-strip" id="health-strip" aria-label="Runtime health"></div>
+          </div>
+        </header>
+
+        <div class="thread-heading">
+          <div>
             <div class="eyebrow"><span class="live-pip"></span>Active Frame</div>
             <h1 id="thread-title">New runtime task</h1>
-            <p>One bounded cycle, fully observable.</p>
           </div>
           <div class="frame-badges">
             <span class="mono-badge" id="thread-id">UNINITIALIZED</span>
@@ -71,11 +92,64 @@
 
         <section class="conversation" id="conversation">
           <div class="empty-state">
-            <div class="empty-orbit"><span></span><i></i><b></b></div>
-            <div class="eyebrow">Ready for a new signal</div>
-            <h3>Direct the runtime.</h3>
-            <p>Choose an inference profile, describe the outcome, and inspect every selected signal and action.</p>
+            <div class="empty-orbit" aria-hidden="true">
+              <div class="atom-nucleus"></div>
+              <span class="atom-ring atom-ring-one"><i></i></span>
+              <span class="atom-ring atom-ring-two"><i></i></span>
+              <span class="atom-ring atom-ring-three"><i></i></span>
+            </div>
+            <h3>Welcome to Engram.</h3>
+            <p>What outcome should the runtime work on?</p>
           </div>
+        </section>
+
+        <form class="composer" id="composer">
+          <div class="composer-field">
+            <textarea id="request-input" rows="3" maxlength="20000" placeholder="Tell Engram what you want to accomplish…" required></textarea>
+            <div class="composer-meta">
+              <label class="gate-toggle">
+                <input type="checkbox" id="allow-side-effects">
+                <span class="toggle-track"><i></i></span>
+                <span>Allow workspace writes</span>
+              </label>
+              <span>Ctrl + Enter</span>
+            </div>
+          </div>
+          <button class="run-button" type="submit" id="run-button">
+            <span>Run</span>
+            <svg viewBox="0 0 20 20"><path d="m7 4 7 6-7 6V4Z"/></svg>
+          </button>
+        </form>
+
+        <section class="capability-dock">
+          <article class="capability-item context-item">
+            <div class="capability-icon token-lens">
+              <div class="lens-orbit" aria-hidden="true"><i></i><i></i><i></i></div>
+              <span id="token-input">—</span>
+            </div>
+            <div>
+              <span class="eyebrow">Attention Composer</span>
+              <strong>Focus Packet</strong>
+              <p><b id="token-saved">—</b> tokens avoided by the Context Lens.</p>
+            </div>
+          </article>
+          <article class="capability-item action-item">
+            <div class="capability-icon action-glyph"><span></span><span></span><span></span></div>
+            <div>
+              <strong>Selected actions <b id="action-count">0</b></strong>
+              <div class="chip-list" id="action-chips"><span class="muted-copy">Awaiting composition</span></div>
+            </div>
+          </article>
+          <article class="capability-item procedure-item">
+            <div class="capability-icon procedure-glyph"><span>◆</span></div>
+            <div>
+              <strong>Procedure cue <b id="procedure-state">None</b></strong>
+              <div class="procedure-cue" id="procedure-cue">
+              <span class="procedure-icon">◇</span>
+              <p>The first successful action sequence will crystallize here.</p>
+            </div>
+            </div>
+          </article>
         </section>
 
         <section class="record-strip" id="record-strip">
@@ -85,76 +159,11 @@
           </div>
           <div class="record-timeline" id="record-timeline"></div>
         </section>
-
-        <form class="composer" id="composer">
-          <div class="composer-field">
-            <textarea id="request-input" rows="3" maxlength="20000" placeholder="Describe the task or outcome…" required></textarea>
-            <div class="composer-meta">
-              <label class="gate-toggle">
-                <input type="checkbox" id="allow-side-effects">
-                <span class="toggle-track"><i></i></span>
-                <span>Allow workspace writes</span>
-              </label>
-              <span>Ctrl + Enter to run</span>
-            </div>
-          </div>
-          <button class="run-button" type="submit" id="run-button">
-            <span>Run cycle</span>
-            <svg viewBox="0 0 20 20"><path d="m7 4 7 6-7 6V4Z"/></svg>
-          </button>
-        </form>
       </main>
-
-      <aside class="focus-rail">
-        <section class="focus-card">
-          <div class="panel-title-row compact">
-            <div>
-              <div class="eyebrow">Attention Composer</div>
-              <h2>Context lens</h2>
-            </div>
-            <div class="packet-pulse"><span></span><i></i></div>
-          </div>
-          <div class="token-lens">
-            <div class="lens-orbit" aria-hidden="true"><i></i><i></i><i></i></div>
-            <div class="lens-core">
-              <span class="metric-value" id="token-input">—</span>
-              <span class="metric-label">estimated input</span>
-            </div>
-            <div class="saved-metric">
-              <span class="saved-spark"></span>
-              <span><strong id="token-saved">—</strong> tokens avoided</span>
-            </div>
-          </div>
-          <div class="focus-section">
-            <div class="section-label"><span>Selected actions</span><b id="action-count">0</b></div>
-            <div class="chip-list" id="action-chips"><span class="muted-copy">Awaiting composition</span></div>
-          </div>
-          <div class="focus-section">
-            <div class="section-label"><span>Procedure cue</span><b id="procedure-state">NONE</b></div>
-            <div class="procedure-cue" id="procedure-cue">
-              <span class="procedure-icon">◇</span>
-              <p>The first successful action sequence will crystallize here.</p>
-            </div>
-          </div>
-        </section>
-
-        <section class="telemetry-card">
-          <div class="eyebrow">Durable signals</div>
-          <div class="telemetry-grid">
-            <div><strong id="experience-count">0</strong><span>Experience</span></div>
-            <div><strong id="procedure-count">0</strong><span>Verified</span></div>
-            <div><strong id="output-count">0</strong><span>Outputs</span></div>
-          </div>
-          <div class="signal-map" aria-hidden="true">
-            <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-            <span></span><span></span><span></span>
-          </div>
-        </section>
-      </aside>
     </div>
   </div>
 
   <div class="toast" id="toast" role="status"></div>
-  <script src="/static/runtime.js" defer></script>
+  <script src="/static/runtime.js?v=7" defer></script>
 </body>
 </html>

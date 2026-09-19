@@ -6,9 +6,9 @@ not reuse the site's commercial layout, copy, media, or page composition.
 
 ## Typography
 
-- Family: Inter Variable, weights 100–900, distributed under the SIL Open Font License.
-- Display: Inter Variable 300 for large runtime headings.
-- Interface: Inter Variable 400 and 500.
+- Family: local Inter Variable, weights 100–900, distributed under the SIL Open Font License.
+- Display: Inter Variable 190–260 with tight tracking for the Threads Mode editorial scale.
+- Interface: Inter Variable 380–520.
 - Emphasis: Inter Variable 600.
 - Code and identifiers: a system monospace stack.
 - Interface line length: 72 characters maximum for explanatory copy.
@@ -31,9 +31,11 @@ not reuse the site's commercial layout, copy, media, or page composition.
 
 ## Material
 
-- Canvas: layered radial gradients over a near-black blue field.
-- Primary glass: `rgba(13, 33, 59, 0.67)` with 18px backdrop blur.
-- Strong glass: `rgba(16, 38, 61, 0.85)` with 24px backdrop blur.
+- Canvas: animated orbital paths, refracted energy streams, and glass spheres
+  over a near-black blue field.
+- Primary glass: 18–43% navy opacity with restrained 5–14px backdrop blur so
+  the moving scene remains visible.
+- Strong glass: used only for the composer and compact dock modules.
 - Edge: one-pixel ice-blue border between 12% and 26% opacity.
 - Depth: broad dark shadow plus a restrained blue ambient glow.
 - Radius: 28px for primary work surfaces, 22px for nested panels, 16px for
@@ -43,25 +45,28 @@ not reuse the site's commercial layout, copy, media, or page composition.
 ## Runtime Console layout
 
 ```text
-┌──────────────────────────────────────────────────────────────────────────┐
-│ Engram  provider / profile                         run status   settings │
-├──────────────┬─────────────────────────────────────┬─────────────────────┤
-│ Run journal  │ Active Frame                        │ Focus Packet        │
-│              │ conversation + action dispatches    │ selected signals    │
-│              │                                     │ and procedures      │
-├──────────────┴─────────────────────────────────────┴─────────────────────┤
-│ Run Record: time-ordered evidence, usage, checks, and stored outputs     │
-└──────────────────────────────────────────────────────────────────────────┘
+┌───────────────┬──────────────────────────────────────────────────────────┐
+│ State Core    │ Engram / provider / runtime health                     │
+│ Run Journal   ├──────────────────────────────────────────────────────────┤
+│ Search + runs │ Active Frame: welcome or conversation                  │
+│               │                                                        │
+│ Durable       │              large centered composer                   │
+│ signals       │ [Focus Packet] [Selected actions] [Procedure cue]      │
+│               │ Run Record                                             │
+└───────────────┴──────────────────────────────────────────────────────────┘
 ```
 
-The workspace is one continuous instrument surface. Run Journal, Active Frame,
-and Context Lens are regions separated by fine rules and material shifts, not
-independent floating cards. At tablet widths, Context Lens continues below the
-main work area; on mobile, all three regions become one vertical reading path.
+The workspace is one continuous chat instrument. State Core and Run Journal
+form a narrow navigation rail. Active Frame occupies the remaining canvas with
+a centered composer. Attention Composer, selected actions, and Procedure Cue
+become three compact modules directly below the composer. Run Record stays
+attached to the bottom edge.
 
-The memorable element is the Context Lens: an orbital instrument that turns
-token reduction into a visible arc. A slowly refracting signal field runs
-behind the Active Frame. Other regions stay quiet so execution remains legible.
+The supplied purple Engram mark is both the product logo and PNG favicon. It
+also appears inside the animated glass spheres. The empty-state core is a
+logo-free rotating atom. Context Lens turns token reduction into a visible arc
+inside Focus Packet. The background moves continuously behind translucent
+surfaces and stops under reduced-motion preferences.
 
 ## Interaction
 

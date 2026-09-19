@@ -3,6 +3,7 @@ const state = {
   currentThreadId: null,
   thread: null,
   busy: false,
+  threadQuery: "",
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -10,6 +11,7 @@ const els = {
   profile: $("#profile-select"),
   health: $("#health-strip"),
   threads: $("#thread-list"),
+  threadSearch: $("#thread-search"),
   title: $("#thread-title"),
   threadId: $("#thread-id"),
   runState: $("#run-state"),
@@ -107,14 +109,18 @@ function renderProfiles(profiles) {
 }
 
 function renderThreads(threads) {
-  els.threads.innerHTML = threads.map((thread) => {
+  const query = state.threadQuery.trim().toLowerCase();
+  const visibleThreads = query
+    ? threads.filter((thread) => thread.title.toLowerCase().includes(query))
+    : threads;
+  els.threads.innerHTML = visibleThreads.map((thread) => {
     const active = thread.id === state.currentThreadId ? "active" : "";
     const status = thread.last_run_status || "ready";
     return `<button class="thread-item ${active}" data-thread="${thread.id}">
       <strong>${escapeHtml(thread.title)}</strong>
       <span><em>${escapeHtml(status)}</em><time>${formatTime(thread.updated_at)}</time></span>
     </button>`;
-  }).join("") || `<div class="muted-copy">No runtime tasks yet.</div>`;
+  }).join("") || `<div class="muted-copy">${query ? "No matching runs." : "No runtime tasks yet."}</div>`;
   els.threads.querySelectorAll("[data-thread]").forEach((button) => {
     button.addEventListener("click", () => selectThread(button.dataset.thread));
   });
@@ -131,10 +137,14 @@ function renderStats(stats) {
 function renderConversation(entries) {
   if (!entries.length) {
     els.conversation.innerHTML = `<div class="empty-state">
-      <div class="empty-orbit"><span></span></div>
-      <div class="eyebrow">Ready for a new signal</div>
-      <h3>Direct the runtime.</h3>
-      <p>Choose an inference profile, describe the outcome, and inspect every selected signal and action.</p>
+      <div class="empty-orbit" aria-hidden="true">
+        <div class="atom-nucleus"></div>
+        <span class="atom-ring atom-ring-one"><i></i></span>
+        <span class="atom-ring atom-ring-two"><i></i></span>
+        <span class="atom-ring atom-ring-three"><i></i></span>
+      </div>
+      <h3>Welcome to Engram.</h3>
+      <p>What outcome should the runtime work on?</p>
     </div>`;
     return;
   }
@@ -265,7 +275,7 @@ async function runCycle(event) {
   } finally {
     state.busy = false;
     els.runButton.disabled = false;
-    els.runButton.querySelector("span").textContent = "Run cycle";
+    els.runButton.querySelector("span").textContent = "Run";
     els.input.focus();
   }
 }
@@ -284,6 +294,10 @@ async function initialize() {
 }
 
 $("#new-thread").addEventListener("click", createThread);
+els.threadSearch.addEventListener("input", () => {
+  state.threadQuery = els.threadSearch.value;
+  renderThreads(state.dashboard?.threads || []);
+});
 els.form.addEventListener("submit", runCycle);
 els.input.addEventListener("keydown", (event) => {
   if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
