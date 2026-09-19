@@ -14,6 +14,10 @@ OpenAI-compatible endpoint.
 Engram Runtime uses its own public vocabulary. The canonical definitions live
 in [`docs/engram-lexicon.md`](docs/engram-lexicon.md).
 
+The Runtime Console follows the crystalline specification in
+[`docs/visual-system.md`](docs/visual-system.md), including Inter Variable and
+the established deep-blue glass material system.
+
 | Component | Responsibility |
 | --- | --- |
 | Inference Gateway | Normalizes local and hosted model providers. |
@@ -44,4 +48,3 @@ in [`docs/build-stages.md`](docs/build-stages.md).
 ## License
 
 Apache-2.0.
-
