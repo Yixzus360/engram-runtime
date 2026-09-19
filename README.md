@@ -45,6 +45,20 @@ the established deep-blue glass material system.
 Active development. The delivery sequence and acceptance gates are documented
 in [`docs/build-stages.md`](docs/build-stages.md).
 
+## Local development
+
+```powershell
+uv sync --all-groups
+./scripts/up.ps1
+. ./scripts/use-local-state.ps1
+uv run engram migrate
+uv run pytest
+```
+
+`scripts/up.ps1` uses Docker directly when available and falls back to the
+Docker engine in WSL2. `scripts/use-local-state.ps1` selects the reachable
+address without persisting credentials or provider keys.
+
 ## License
 
 Apache-2.0.

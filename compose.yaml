@@ -1,0 +1,23 @@
+name: engram-runtime
+
+services:
+  state-core:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: engram
+      POSTGRES_USER: engram
+      POSTGRES_PASSWORD: engram
+    ports:
+      - "5439:5432"
+    volumes:
+      - engram-state:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U engram -d engram"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  engram-state:
+
