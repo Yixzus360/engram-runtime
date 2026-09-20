@@ -23,48 +23,107 @@ checks enabled.
 
 ## Controlled comparison
 
-The fixed plan runs the official small tier twice over both domains:
+The fixed plan runs the official small tier three times over both domains:
 
-- Engram OFF uses the official `no_retrieval` memory method.
+- Engram OFF is explicitly the official `no_retrieval` memory method.
+- Conventional RAG uses the official `rag_query_to_slice` method as a secondary
+  retrieval baseline.
 - Engram ON uses `engram_runtime`.
-- Both conditions use the same local `Qwen/Qwen3.5-9B` reader with official
-  generation defaults.
-- Both conditions use the same pinned `gpt-5.2-2025-12-11` evaluator for the
-  question types that require an LLM judge.
+- All conditions use the same `gpt-6-astra` reader at the `low` reasoning
+  variant through OpenCode and ChatGPT OAuth. Each question gets a fresh
+  OpenCode session; prompts travel through stdin, tool calls are rejected,
+  autocompaction is disabled, and there are no hidden retries.
+- OpenCode adds a fixed client system prompt and the OAuth transport differs
+  from the benchmark's ordinary API reader, so this is recorded as a separate
+  frontier-reader replication rather than an official leaderboard submission.
+- All conditions use `gpt-5.5` at reasoning `medium` through OpenCode and
+  ChatGPT OAuth for question types that require an LLM judge. The 885
+  deterministic scores are unchanged. The 468 judge calls use a distinct model
+  from the Astra answer reader and persist their token usage and session IDs.
 
-This produces 902 local reader calls. Of the 902 scored answers, 590 use
-deterministic graders and 312 require the OpenAI evaluator: 128 abstention and
+This produces 1,353 reader calls. Of the 1,353 scored answers, 885 use
+deterministic graders and 468 require the OpenAI evaluator: 128 abstention and
 28 gotcha questions in each condition.
+
+### Protocol amendment after the smoke gate
+
+The initial plan enabled reader thinking. The first matched smoke exposed a
+runtime failure in the conventional RAG condition: the reader consumed the
+fixed 20,000-token completion allowance without emitting a final boxed answer.
+That single RAG question took 73.3 minutes, including 64.8 minutes of first-use
+embedding work and 8.2 minutes of reader generation. Continuing unchanged
+would both create invalid answers and miss the 24-hour execution target.
+
+On 2026-09-20 the user authorized disabling reader thinking. The revision is
+applied identically to `no_retrieval`, `rag_query_to_slice`, and
+`engram_runtime`; no scored full-study run had started and evaluator spend was
+$0. Before the full study, all three deterministic smoke tests must be repeated
+and must produce a parseable final answer. The pre-amendment smoke artifacts
+remain preserved as evidence for the decision.
+
+The repeated no-thinking smoke still failed in the Qwen RAG condition: it used
+the full 20,000-token output allowance without a boxed answer and took 577.3
+seconds. The user then authorized using OpenCode with a non-Qwen frontier
+model. The answer reader was changed, before any full-study result existed, to
+`gpt-6-astra` at reasoning `low`. The local Qwen3-Embedding-8B model remains
+only as the frozen vector encoder for the conventional RAG comparator.
+
+Matched integral smokes passed for OFF, RAG, and Engram ON. Astra generation
+took 9.69, 11.40, and 7.84 seconds respectively. The RAG case included 164,384
+prompt tokens and five images. A second gate completed four OFF questions with
+two concurrent readers in 20.8 seconds, and concurrency two also passed for RAG
+and Engram. The same concurrency and prompt-worker count are fixed across all
+three conditions.
 
 ## Local requirements
 
-The host has an RTX 3090 with 24 GB VRAM. WSL2 Ubuntu sees the GPU and has
-approximately 913 GB free. The official Qwen3.5-9B repository contains 19.33 GB
-of model files. Engram uses its existing local State Core and embedding model;
-the benchmark's Qwen3-Embedding-8B endpoint is not required for this method.
+The host has an RTX 3090 with 24 GB VRAM and approximately 913 GB free under
+WSL2. Astra runs remotely through OpenCode, so the GPU is available for
+Engram's local encoder and the conventional RAG embedding endpoint. The local
+Qwen answer-reader experiments remain preserved but are no longer part of the
+full matrix.
 
-The reader therefore has no per-token API charge. It still requires a local
-OpenAI-compatible server, conservative concurrency, and a context limit that
-fits the 24 GB device.
+OpenCode reported USD 0 for the Astra OAuth smoke calls. Those calls still
+consume ChatGPT account usage and can encounter subscription limits. The
+observed reader and local retrieval timings support a planning range of four to
+six hours with concurrency two; five hours is the target, not a guaranteed
+deadline, because provider throttling and the 468 GPT evaluator calls remain
+variable.
 
-## Evaluator cost gate
+## Evaluator transport and cost
 
-Official OpenAI pricing captured on 2026-09-20 for GPT-5.2 is $1.75 per million
-input tokens, $0.175 per million cached input tokens, and $14.00 per million
-output tokens. The exact bill cannot be known before the reader outputs exist
-because those outputs become part of the judge prompts and reasoning output is
-usage-dependent.
+The original preflight reserved up to US$30 for 468 GPT-5.2 API judge calls.
+Before the full study reached scoring, the run was stopped with zero evaluator
+calls and zero evaluator spend. The user authorized replacing that paid route
+with a subscription-backed judge.
 
-For 312 evaluator calls:
+The replacement smoke used the official abstention grader path with GPT-5.5
+medium through OpenCode OAuth. It completed in 9.84 seconds, recorded 10,010
+input tokens, 40 output tokens, 22 reasoning tokens, and reported US$0. The
+wrapper disables hidden retries and records each OAuth judge call in a
+persistent JSONL ledger. OAuth calls can still consume ChatGPT subscription
+usage or hit account limits, but they do not use the OpenAI API key or the
+former US$30 budget.
 
-- a practical planning range is roughly **$2-$10**;
-- the configured no-retry ceiling, if every call consumed about 20,500 input
-  tokens and all 4,096 output tokens, is approximately **$29.10**;
-- transient retries can raise the amount, so the run must retain an external
-  spend limit and checkpoint usage.
-
-No paid evaluator call was made during data preparation. A one-question-per-
-condition calibration should be run first after approval, then its measured
-usage should replace the planning range before the remaining 449 pairs proceed.
+Evaluator OAuth usage is reported separately from reader OAuth usage and local
+execution. Reader wall time and tokens, memory indexing time, embedding work,
+retrieval time, and memory-context tokens remain separate operational
+measurements.
 
 Pricing source: https://developers.openai.com/api/docs/models/gpt-5.2
+
+## Completed execution
+
+The controlled matrix finished on 2026-09-20 with all six conditions complete:
+1,353 reader responses, 885 deterministic evaluations, and 468 settled OAuth
+judge records. OpenCode reported US$0 of direct API cost. One historical OAuth
+limit failure remains in the audit ledger but its three partial scored rows are
+excluded; that condition was archived and rerun from the beginning.
+
+The objective primary result was 59/295 (20.0%) for Engram ON versus 0/295 for
+OFF, a paired difference of +20.0 percentage points (95% bootstrap interval
++15.6 to +24.7; exact McNemar `p = 3.47e-18`). Conventional RAG reached
+100/295 (33.9%). Engram therefore demonstrated a real memory benefit over OFF
+and a 91.2% reader-prompt reduction versus RAG, while remaining less accurate
+than RAG. See the [full result](../../docs/longmemeval-v2-results.md) and the
+[machine-readable analysis](longmemeval-v2-results.json).

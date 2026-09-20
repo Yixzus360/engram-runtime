@@ -111,11 +111,28 @@ indexes them through Engram, and retrieves solely from the question text. It
 does not receive question IDs, gold answers, grader configuration, or other
 private benchmark metadata.
 
+### Completed small-tier replication
+
+The six-condition study completed all 1,353 responses: OFF, conventional RAG,
+and Engram ON across web and enterprise. The objective primary score was
+**0/295 for OFF, 59/295 (20.0%) for Engram ON, and 100/295 (33.9%) for RAG**.
+Engram's paired improvement over OFF was +20.0 percentage points (95% bootstrap
+interval +15.6 to +24.7; exact McNemar `p = 3.47e-18`). Against RAG, Engram
+used 91.2% fewer reader prompt tokens and 39.0% less condition wall time, but
+trailed objective accuracy by 13.9 points.
+
+These results show a significant memory benefit over no retrieval and a strong
+context-efficiency advantage over the fixed RAG comparator. They also show that
+Engram retrieval still needs quality work before it matches that comparator.
+The [complete report](longmemeval-v2-results.md) preserves the result tables,
+protocol, limits, and reproduction command; the
+[JSON result](../benchmarks/scientific/longmemeval-v2-results.json) is the
+machine-readable source.
+
 The wrapper refuses a LongMemEval-V2 checkout that does not match the pinned
-commit in the protocol. The official dataset revision totals about 7.12 GB.
-The text-first pilot fetches about 1.20 GB and deliberately excludes 5.92 GB of
-trajectory screenshot archives; that run must be labeled text-first and cannot
-be presented as the full multimodal configuration.
+commit in the protocol. The complete official dataset revision totals about
+7.12 GB of downloads and 19.53 GB after preparation. The official small-tier
+validator passed with screenshot checks enabled.
 
 ```powershell
 uv run python scripts/fetch_longmemeval_text.py `
@@ -126,7 +143,9 @@ uv run python artifacts\official\LongMemEval-V2\data\validate_data.py `
   --no-check-screenshots
 ```
 
-After the deliberate data step, run a small-domain smoke test from this repository:
+After the deliberate data step, run a small-domain adapter smoke test from this
+repository. The command below is an API-reader diagnostic and is separate from
+the completed OpenCode OAuth matrix:
 
 ```powershell
 uv sync --extra longmemeval
@@ -148,9 +167,8 @@ uv run python benchmarks/adapters/run_longmemeval_v2.py `
 The official data download includes screenshot archives and can be large, so it
 is a deliberate setup step rather than an implicit side effect of the runner.
 
-The pinned full dataset has now passed the official small-tier validator with
-screenshots enabled. The frozen OFF/ON execution manifest, question counts,
-local hardware requirements, and paid-evaluator cost gate are recorded in
+The frozen execution manifest, question counts, local hardware requirements,
+protocol amendments, and zero-direct-API-cost evaluator route are recorded in
 [`benchmarks/scientific/longmemeval-v2-preflight.md`](../benchmarks/scientific/longmemeval-v2-preflight.md)
 and
 [`benchmarks/scientific/longmemeval-v2-plan.json`](../benchmarks/scientific/longmemeval-v2-plan.json).

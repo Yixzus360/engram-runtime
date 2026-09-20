@@ -200,8 +200,12 @@ uv run engram-debate --help
 ```
 
 The internal tasks are an instrumentation pilot. The official external track
-starts with a pinned LongMemEval-V2 adapter and then adds execution, coding, and
-tool-use suites. See
+now includes a completed pinned LongMemEval-V2 small-tier replication. On the
+objective subset, Engram ON scored 59/295 (20.0%) versus 0/295 without
+retrieval. Conventional RAG scored 100/295 (33.9%); Engram used 91.2% fewer
+reader prompt tokens than RAG but did not match its accuracy. See the
+[`LongMemEval-V2 result`](docs/longmemeval-v2-results.md). The external track
+next adds execution, coding, and tool-use suites. See
 [`docs/scientific-benchmark.md`](docs/scientific-benchmark.md) and the
 [`preregistration`](benchmarks/scientific/preregistration.md) for the claim
 boundary, fixed hypotheses, metrics, exclusions, and stopping rule. The latest
