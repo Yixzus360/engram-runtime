@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "benchmark": "LongMemEval-V2",
+  "repository_commit": "2cc8c540bdb87fe6761629b585e727e1c4704520",
+  "dataset_revision": "f152293e235517d504809563c833d7190b8c713b",
+  "tier": "small",
+  "domains": {
+    "web": 240,
+    "enterprise": 211
+  },
+  "questions_total": 451,
+  "trajectories_total": 1870,
+  "conditions": {
+    "engram_off": "no_retrieval",
+    "engram_on": "engram_runtime"
+  },
+  "reader": {
+    "model": "Qwen/Qwen3.5-9B",
+    "execution": "local OpenAI-compatible endpoint",
+    "thinking": true,
+    "temperature": 0.6,
+    "top_p": 0.95,
+    "top_k": 20,
+    "max_completion_tokens": 20000,
+    "calls": 902
+  },
+  "evaluator": {
+    "model": "gpt-5.2-2025-12-11",
+    "reasoning_effort": "medium",
+    "max_completion_tokens": 4096,
+    "llm_graded_questions_per_condition": 156,
+    "calls_without_retries": 312,
+    "deterministically_graded_calls": 590
+  },
+  "execution_order": [
+    "engram_off_web",
+    "engram_on_web",
+    "engram_on_enterprise",
+    "engram_off_enterprise"
+  ],
+  "claim_boundary": "Official small-tier dataset and grader with the fixed Qwen3.5-9B reader. Engram OFF/ON is the same reader and question set with only the memory method changed."
+}

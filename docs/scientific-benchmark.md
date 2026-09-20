@@ -148,6 +148,13 @@ uv run python benchmarks/adapters/run_longmemeval_v2.py `
 The official data download includes screenshot archives and can be large, so it
 is a deliberate setup step rather than an implicit side effect of the runner.
 
+The pinned full dataset has now passed the official small-tier validator with
+screenshots enabled. The frozen OFF/ON execution manifest, question counts,
+local hardware requirements, and paid-evaluator cost gate are recorded in
+[`benchmarks/scientific/longmemeval-v2-preflight.md`](../benchmarks/scientific/longmemeval-v2-preflight.md)
+and
+[`benchmarks/scientific/longmemeval-v2-plan.json`](../benchmarks/scientific/longmemeval-v2-plan.json).
+
 ## Cost semantics
 
 The runner records reported input, cached input, uncached input, output, and
