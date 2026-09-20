@@ -28,12 +28,20 @@ class KeywordEncoder:
         return vectors
 
 
+class CountingKeywordEncoder(KeywordEncoder):
+    def __init__(self) -> None:
+        self.batch_sizes: list[int] = []
+
+    def encode(self, texts: Sequence[str]) -> list[list[float]]:
+        self.batch_sizes.append(len(texts))
+        return super().encode(texts)
+
+
 class KeywordRefiner:
     def score(self, query: str, documents: Sequence[str]) -> list[float]:
         words = set(query.casefold().split())
         return [
-            float(len(words.intersection(document.casefold().split())))
-            for document in documents
+            float(len(words.intersection(document.casefold().split()))) for document in documents
         ]
 
 
@@ -73,6 +81,51 @@ def test_hybrid_retrieval_and_refinement(core: StateCore) -> None:
 
 
 def test_fingerprint_normalizes_case_and_spacing() -> None:
-    assert SignalIndex.fingerprint(" Durable  Signal ") == SignalIndex.fingerprint(
-        "durable signal"
+    assert SignalIndex.fingerprint(" Durable  Signal ") == SignalIndex.fingerprint("durable signal")
+
+
+def test_remember_many_embeds_batch_once(core: StateCore) -> None:
+    workspace = core.ensure_workspace(f"batch-{uuid.uuid4().hex[:8]}", "Batch test")
+    encoder = CountingKeywordEncoder()
+    index = SignalIndex(core, encoder)
+
+    rows = index.remember_many(
+        workspace["id"],
+        [
+            {
+                "experience_form": "run_journal",
+                "content": "Postgres batch one",
+                "source": "test",
+            },
+            {
+                "experience_form": "run_journal",
+                "content": "Python batch two",
+                "source": "test",
+            },
+        ],
     )
+
+    assert len(rows) == 2
+    assert encoder.batch_sizes == [2]
+
+
+def test_remember_many_uses_supplied_embeddings(core: StateCore) -> None:
+    workspace = core.ensure_workspace(f"cached-{uuid.uuid4().hex[:8]}", "Cached test")
+    encoder = CountingKeywordEncoder()
+    index = SignalIndex(core, encoder)
+    embedding = KeywordEncoder().encode(["cached vector"])[0]
+
+    rows = index.remember_many(
+        workspace["id"],
+        [
+            {
+                "experience_form": "run_journal",
+                "content": "cached vector",
+                "source": "test",
+                "embedding": embedding,
+            }
+        ],
+    )
+
+    assert len(rows) == 1
+    assert encoder.batch_sizes == []

@@ -448,6 +448,10 @@ class InferenceProfile:
     model: str
     reasoning_effort: str | None
     max_output_tokens: int
+    tier: str = "balanced"
+    credential_env: str | None = None
+    base_url: str | None = None
+    enabled: bool = True
 
 
 class InferenceRouter:
@@ -475,9 +479,9 @@ def standard_router(
 ) -> InferenceRouter:
     return InferenceRouter(
         [
-            InferenceProfile("local", "ollama", local_model, None, 1200),
-            InferenceProfile("economy", "openai", economy_model, "low", 1200),
+            InferenceProfile("local", "ollama", local_model, None, 1200, tier="local"),
+            InferenceProfile("economy", "openai", economy_model, "low", 1200, tier="economy"),
             InferenceProfile("balanced", "openai", balanced_model, "medium", 1800),
-            InferenceProfile("frontier", "openai", frontier_model, "high", 2400),
+            InferenceProfile("frontier", "openai", frontier_model, "high", 2400, tier="frontier"),
         ]
     )

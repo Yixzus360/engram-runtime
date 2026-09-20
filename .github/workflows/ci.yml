@@ -1,0 +1,52 @@
+name: Runtime checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: engram
+          POSTGRES_PASSWORD: engram
+          POSTGRES_DB: engram_test
+        ports:
+          - 5439:5432
+        options: >-
+          --health-cmd "pg_isready -U engram -d engram_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      ENGRAM_TEST_DATABASE_URL: postgresql://engram:engram@localhost:5439/engram_test
+      ENGRAM_DATABASE_URL: postgresql://engram:engram@localhost:5439/engram_test
+      ENGRAM_REQUIRE_DB: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.8.22"
+          python-version: "3.12"
+          enable-cache: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: uv sync --locked --all-groups
+      - run: uv run ruff check .
+      - run: uv run engram migrate
+      - run: uv run pytest --junitxml=artifacts/tests.xml
+      - run: node --check src/engram_runtime/static/runtime.js
+      - run: uv build
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: runtime-verification
+          path: |
+            artifacts/tests.xml
+            dist/*

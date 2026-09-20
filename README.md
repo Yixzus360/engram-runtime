@@ -140,6 +140,87 @@ selected action schemas fell from three to one. These are measured local
 estimates for that run, not a universal savings claim. The evidence is recorded
 in [`docs/verification.md`](docs/verification.md).
 
+## Codex through MCP
+
+Engram can run as a local [Model Context Protocol](https://modelcontextprotocol.io/)
+server. In this mode, Codex remains the reasoning host and keeps the model the
+operator selected. Engram contributes only a compact, project-scoped memory
+packet and records validated outcomes for later work.
+
+The committed [`.codex/config.toml`](.codex/config.toml) starts the server over
+standard input/output for this repository. It exposes three bounded tools:
+
+| Tool | Purpose |
+| --- | --- |
+| `runtime_status` | Report local storage readiness and scoped memory counts. |
+| `recall_signals` | Return up to three concise signals relevant to one task. |
+| `preserve_signal` | Store one evidence-backed fact, decision, constraint, outcome, correction, or failure. |
+
+The bridge rejects likely credentials, caps input and output sizes, labels
+writes for the host, and uses the isolated `codex-evaluation` workspace. Start
+a new Codex task from this repository after changing MCP configuration so the
+host can load the project server.
+
+The reproducible evaluator runs the same read-only task against isolated
+repository copies with the same model and reasoning effort:
+
+```powershell
+uv run engram-benchmark --mode both --model gpt-5.6-luna --reasoning low
+```
+
+In the first optimized five-task run, Engram reduced total input tokens by
+5.7%, uncached input by 24.0%, output by 18.9%, elapsed inference time by 21.3%,
+and repository tool calls by 25.0%. Expected-answer coverage increased from
+14/15 to 15/15. The local memory seed took 12.151 seconds and is reported
+separately. This is an initial single-run result rather than a universal
+savings claim. See [`benchmarks/codex/latest-results.md`](benchmarks/codex/latest-results.md)
+for the full table and limitations.
+
+### Scientific evaluation track
+
+The expanded evaluator defines a randomized, paired matrix across GPT-5.5,
+GPT-5.6 Luna, Terra, Sol, and GPT-6 Astra. It holds model, effort, task,
+frozen snapshot, non-Engram tools, and budget constant inside every Engram
+OFF/ON pair, supports
+checkpointed resume, and reports exact McNemar and paired bootstrap/sign-flip
+statistics. Its five-repetition pilot contains 125 pairs and 250 runs.
+
+That pilot is now complete. Engram improved paired completion from 110/125 to
+125/125 (exact McNemar p=0.000061) while reducing aggregate uncached input by
+17.8%, output by 20.6%, wall time by 14.6%, and tool calls by 24.5%. The gain in
+completion was concentrated in one internal task, so this is evidence for the
+locked task set rather than a general claim. See the
+[`full pilot result`](benchmarks/scientific/latest-pilot.md).
+
+```powershell
+uv run engram-science plan
+uv run engram-science run --max-pairs 1
+uv run engram-science analyze
+uv run engram-debate --help
+```
+
+The internal tasks are an instrumentation pilot. The official external track
+now includes a completed pinned LongMemEval-V2 small-tier replication. On the
+objective subset, Engram ON scored 59/295 (20.0%) versus 0/295 without
+retrieval. Conventional RAG scored 100/295 (33.9%); Engram used 91.2% fewer
+reader prompt tokens than RAG but did not match its accuracy. See the
+[`LongMemEval-V2 result`](docs/longmemeval-v2-results.md). The external track
+next adds execution, coding, and tool-use suites. See
+[`docs/scientific-benchmark.md`](docs/scientific-benchmark.md) and the
+[`preregistration`](benchmarks/scientific/preregistration.md) for the claim
+boundary, fixed hypotheses, metrics, exclusions, and stopping rule. The latest
+five-model harness check is published separately as a clearly labeled
+[`smoke test`](benchmarks/scientific/latest-smoke.md).
+The matching [`blind jury report`](benchmarks/scientific/latest-debate.md)
+keeps model critiques separate from the objective ON/OFF endpoint.
+
+A preregistered 30-question equal-budget diagnostic then compared Engram and
+RAG at 4k, 8k, 16k, and 32k memory caps. At 16k, Engram scored 26.7% versus
+20.0% for RAG while using 22.6% fewer observed reader prompt tokens. The small
+sample is diagnostic rather than statistically conclusive; its main finding is
+that current Engram retrieval plateaus above 8k. See the
+[`equal-budget curve`](docs/longmemeval-v2-budget-curve-results.md).
+
 ## Local stack
 
 - Python 3.12 and FastAPI for the runtime service.
@@ -224,6 +305,10 @@ uv sync --extra universal
 | [`src/engram_runtime/sql/`](src/engram_runtime/sql/) | Transactional State Core schema and pgvector indexes. |
 | [`tests/`](tests/) | Behavioral checks for isolation, retrieval, learning, gating, routing, and token composition. |
 | [`docs/`](docs/) | Architecture, vocabulary, visual contract, build stages, and verified evidence. |
+| [`benchmarks/codex/`](benchmarks/codex/) | Reproducible Codex tasks, scoring terms, and the latest paired result. |
+| [`benchmarks/scientific/`](benchmarks/scientific/) | Preregistered matrix, pinned external suites, prices, and statistical decision rules. |
+| [`benchmarks/adapters/`](benchmarks/adapters/) | Bridges to official third-party benchmark harnesses. |
+| [`.codex/config.toml`](.codex/config.toml) | Repository-scoped local MCP connection for Codex. |
 | [`scripts/`](scripts/) | PowerShell lifecycle scripts for local Windows and WSL2 development. |
 | [`compose.yaml`](compose.yaml) | Local PostgreSQL and pgvector service definition. |
 | [`.env.example`](.env.example) | Safe configuration template without credentials. |
@@ -231,9 +316,13 @@ uv sync --extra universal
 
 ## Current status
 
-The eight-stage local MVP is complete and verified. It includes State Core,
+The nine-stage local MVP is complete and verified. It includes State Core,
 Signal Index, Experience Ledger, Capability Forge, Action Cycle, Attention
 Composer, provider profiles, procedure learning, and the Runtime Console.
+
+The ninth stage adds a local MCP bridge, repository-scoped Codex configuration,
+and a paired evaluation harness. The bridge does not replace the host model or
+silently change its reasoning level.
 
 Current scope:
 

@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "study_id": "engram-paired-2026-09",
+  "title": "Engram Runtime paired agent-memory evaluation",
+  "research_question": "Does Engram improve agent performance generally and with statistically defensible evidence?",
+  "phase": "pilot",
+  "models": [
+    "gpt-5.5",
+    "gpt-5.6-luna",
+    "gpt-5.6-terra",
+    "gpt-5.6-sol",
+    "gpt-6-astra"
+  ],
+  "excluded_models": {
+    "gpt-5.3-codex-spark": "Unavailable to Codex with this ChatGPT account during preflight; excluded before data collection."
+  },
+  "design": {
+    "conditions": ["baseline", "engram"],
+    "pairing_unit": "same model, task, repetition, frozen snapshot, shared instructions, non-Engram tools, and budget; the Engram recall directive and tool are the treatment",
+    "pair_order": "randomized within every pair",
+    "reasoning_effort": "high",
+    "pilot_repetitions": 5,
+    "confirmatory_repetitions": 10,
+    "random_seed": 260919,
+    "bootstrap_samples": 10000,
+    "alpha": 0.05
+  },
+  "task_source": {
+    "family": "internal_repo_qa",
+    "path": "benchmarks/codex/tasks.json",
+    "role": "instrumentation pilot only; not evidence of generalization"
+  },
+  "tracks": {
+    "multi_model": "Five-model Engram OFF/ON generalization study at common reasoning effort.",
+    "official_memory": "LongMemEval-V2 with its fixed-reader methodology for comparison, followed by a separately labeled OpenAI-reader replication."
+  },
+  "official_benchmarks": [
+    {
+      "name": "LongMemEval-V2",
+      "repository": "https://github.com/xiaowu0162/LongMemEval-V2",
+      "commit": "2cc8c540bdb87fe6761629b585e727e1c4704520",
+      "dataset": "xiaowu0162/longmemeval-v2",
+      "dataset_revision": "f152293e235517d504809563c833d7190b8c713b",
+      "role": "primary external memory benchmark"
+    },
+    {
+      "name": "Terminal-Bench",
+      "repository": "https://github.com/harbor-framework/terminal-bench",
+      "role": "external agent execution benchmark; version must be pinned before confirmatory run"
+    },
+    {
+      "name": "SWE-bench Verified",
+      "repository": "https://github.com/SWE-bench/SWE-bench",
+      "role": "external software-engineering benchmark; release must be pinned before confirmatory run"
+    },
+    {
+      "name": "Berkeley Function Calling Leaderboard V4",
+      "repository": "https://github.com/ShishirPatil/gorilla",
+      "role": "external tool-use benchmark; release must be pinned before confirmatory run"
+    }
+  ],
+  "primary_endpoint": {
+    "name": "paired_task_completion_difference",
+    "definition": "Engram ON completion minus Engram OFF completion",
+    "test": "two-sided exact McNemar test",
+    "grader": "objective benchmark verifier or executable tests"
+  },
+  "secondary_endpoints": [
+    "official accuracy or coverage score",
+    "reported input, cached input, uncached input, output, and reasoning tokens",
+    "API list-price equivalent in USD",
+    "wall-clock latency",
+    "tool calls",
+    "observable errors",
+    "reported context consumption"
+  ],
+  "pricing_manifest": "benchmarks/scientific/pricing.json",
+  "llm_judging_policy": "LLM judgments are secondary diagnostics only and cannot override an objective grader.",
+  "claim_policy": "The pilot estimates feasibility and variance. General claims require the confirmatory sample and official external benchmarks."
+}

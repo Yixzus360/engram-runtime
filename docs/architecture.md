@@ -24,12 +24,21 @@ flowchart TB
     Cycle --> State
     Cycle --> Learner[Pattern Distillation]
     Learner --> Forge
+    Codex[Codex or another MCP host] --> MCP[Engram MCP bridge]
+    MCP --> Ledger
+    MCP --> State
 ```
 
 All default services run on one workstation. PostgreSQL with pgvector provides
 transactional storage and vector discovery. Ollama supplies local inference and
 embeddings. The browser-based Runtime Console connects only to the local FastAPI
 service.
+
+The MCP bridge is a second local entry point over the same State Core and
+Experience Ledger. The host keeps control of inference and model selection;
+Engram supplies scoped retrieval and evidence-backed persistence. MCP requests
+do not pass through Inference Gateway unless the host separately asks Engram's
+own runtime to execute a task.
 
 ## Boundaries
 
@@ -100,3 +109,8 @@ selection decision; it is not presented as an invoice or guaranteed saving.
 The MVP is a local single-operator runtime. It has no hosted account layer,
 remote tenancy, distributed job worker, or production network perimeter. These
 are deliberate scope boundaries rather than implicit security guarantees.
+
+The repository-scoped MCP connection uses `stdio`, so it does not open another
+network listener. PostgreSQL and Ollama remain local dependencies. The bridge
+does not expose arbitrary file access and rejects content that resembles a
+credential or private key.

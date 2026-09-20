@@ -170,6 +170,76 @@ class SignalIndex:
             connection.commit()
             return row
 
+    def remember_many(
+        self,
+        workspace_id: UUID,
+        experiences: Sequence[dict[str, Any]],
+    ) -> list[dict[str, Any]]:
+        """Embed and persist a batch in one encoder call and one transaction."""
+        if not experiences:
+            return []
+        contents = [str(item["content"]) for item in experiences]
+        if any(not content.strip() for content in contents):
+            raise ValueError("experience content cannot be empty")
+        vectors: list[list[float] | None] = [
+            item.get("embedding") if isinstance(item.get("embedding"), list) else None
+            for item in experiences
+        ]
+        missing_indices = [index for index, vector in enumerate(vectors) if vector is None]
+        if missing_indices:
+            encoded = self.encoder.encode([contents[index] for index in missing_indices])
+            if len(encoded) != len(missing_indices):
+                raise ValueError("The encoder returned a different number of vectors than inputs.")
+            for index, vector in zip(missing_indices, encoded, strict=True):
+                vectors[index] = vector
+
+        rows: list[dict[str, Any]] = []
+        with self.core.pool.connection() as connection, connection.cursor() as cursor:
+            for item, content, vector in zip(
+                experiences,
+                contents,
+                vectors,
+                strict=True,
+            ):
+                if vector is None:
+                    raise RuntimeError("Missing embedding after batch encoding")
+                cursor.execute(
+                    """
+                    INSERT INTO engram_experience (
+                        workspace_id, worker_id, thread_id, experience_form, content,
+                        fingerprint, source, confidence, attributes, embedding
+                    )
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (workspace_id, experience_form, fingerprint)
+                    DO UPDATE SET
+                        worker_id = EXCLUDED.worker_id,
+                        thread_id = EXCLUDED.thread_id,
+                        source = EXCLUDED.source,
+                        confidence = EXCLUDED.confidence,
+                        attributes = EXCLUDED.attributes,
+                        embedding = EXCLUDED.embedding,
+                        superseded_by = NULL,
+                        expires_at = NULL,
+                        updated_at = now()
+                    RETURNING *
+                    """,
+                    (
+                        workspace_id,
+                        item.get("worker_id"),
+                        item.get("thread_id"),
+                        str(item["experience_form"]),
+                        content,
+                        self.fingerprint(content),
+                        str(item["source"]),
+                        float(item.get("confidence", 1.0)),
+                        json.dumps(item.get("attributes") or {}),
+                        vector,
+                    ),
+                )
+                rows.append(cursor.fetchone())
+            connection.commit()
+        return rows
+
     def search(
         self,
         workspace_id: UUID,
@@ -228,8 +298,7 @@ class SignalIndex:
             if len(scores) != len(candidates):
                 raise ValueError("The result refiner returned an invalid score count.")
             rerank_scores = {
-                item["id"]: score
-                for item, score in zip(candidates, scores, strict=True)
+                item["id"]: score for item, score in zip(candidates, scores, strict=True)
             }
             candidates.sort(
                 key=lambda item: (rerank_scores[item["id"]], item["rrf_score"]), reverse=True

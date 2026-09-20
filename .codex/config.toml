@@ -1,0 +1,9 @@
+[mcp_servers.engram]
+command = "uv"
+args = ["run", "engram-mcp"]
+cwd = "."
+enabled = true
+startup_timeout_sec = 30
+tool_timeout_sec = 60
+enabled_tools = ["runtime_status", "recall_signals", "preserve_signal"]
+env = { ENGRAM_WORKSPACE_SLUG = "codex-evaluation" }

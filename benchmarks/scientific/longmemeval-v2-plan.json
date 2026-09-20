@@ -1,0 +1,135 @@
+{
+  "schema_version": 4,
+  "benchmark": "LongMemEval-V2",
+  "repository_commit": "2cc8c540bdb87fe6761629b585e727e1c4704520",
+  "dataset_revision": "f152293e235517d504809563c833d7190b8c713b",
+  "tier": "small",
+  "domains": {
+    "web": 240,
+    "enterprise": 211
+  },
+  "questions_total": 451,
+  "trajectories_total": 1870,
+  "conditions": {
+    "engram_off": "no_retrieval",
+    "conventional_rag": "rag_query_to_slice",
+    "engram_on": "engram_runtime"
+  },
+  "reader": {
+    "model": "gpt-6-astra",
+    "execution": "OpenCode CLI through ChatGPT OAuth",
+    "runtime_model": "openai/gpt-6-astra",
+    "reasoning_variant": "low",
+    "quantization": null,
+    "result_classification": "OpenCode frontier-reader replication on the official dataset and grader; not an official leaderboard submission",
+    "thinking": false,
+    "temperature": "provider default; OpenCode OAuth transport does not expose the official reader sampler flags",
+    "max_completion_tokens": 20000,
+    "reader_max_concurrent_requests": 2,
+    "prompt_build_max_workers": 2,
+    "calls": 1353,
+    "billing": "OpenCode reported USD 0 through ChatGPT OAuth in smoke tests; calls consume account usage and may be limited by the subscription",
+    "transport_controls": [
+      "fresh session per question",
+      "stdin prompt transport",
+      "tools rejected",
+      "no hidden retries",
+      "autocompaction disabled"
+    ],
+    "protocol_revisions": [
+      {
+        "authorized_at": "2026-09-20",
+        "change": "disable reader thinking identically for all three conditions",
+        "reason": "The Qwen thinking-enabled RAG smoke exhausted 20000 output tokens without a final answer."
+      },
+      {
+        "authorized_at": "2026-09-20",
+        "change": "replace the quantized local Qwen answer reader with GPT-6 Astra low through OpenCode and use concurrency 2 identically for all conditions",
+        "reason": "The user requested a non-Qwen frontier model and a target near five hours. Matched Astra smokes passed all transports, including 164383 prompt tokens and five images."
+      },
+      {
+        "authorized_at": "2026-09-20",
+        "change": "replace the paid GPT-5.2 API judge with GPT-5.5 medium through OpenCode ChatGPT OAuth before scoring began",
+        "reason": "The user requested avoiding API spend. The official grader path passed an OAuth smoke with zero reported direct API cost."
+      }
+    ],
+    "smoke_gate": {
+      "matched_conditions_passed": true,
+      "no_retrieval_reader_seconds": 9.69,
+      "engram_runtime_reader_seconds": 7.84,
+      "rag_query_to_slice_reader_seconds": 11.4,
+      "rag_prompt_tokens": 164384,
+      "rag_images": 5,
+      "concurrency_2_passed": true,
+      "four_off_generation_wall_seconds": 20.8
+    }
+  },
+  "conventional_rag": {
+    "method": "rag_query_to_slice",
+    "embedding_model": "Qwen/Qwen3-Embedding-8B",
+    "execution": "local OpenAI-compatible endpoint",
+    "raw_state_slice_radius": 1,
+    "raw_state_search_top_k": 6,
+    "notes_enabled": false,
+    "answer_reader": "gpt-6-astra via OpenCode OAuth",
+    "embedding_role_note": "Qwen3-Embedding-8B remains only as the frozen local vector embedding model for the conventional RAG comparator; it is not the answer reader."
+  },
+  "evaluator": {
+    "model": "gpt-5.5",
+    "execution": "OpenCode CLI through ChatGPT OAuth",
+    "reasoning_effort": "medium",
+    "max_completion_tokens": 4096,
+    "llm_graded_questions_per_condition": 156,
+    "calls_without_retries": 468,
+    "deterministically_graded_calls": 885,
+    "direct_api_budget_usd": 0,
+    "hidden_retries": 0,
+    "billing": "OpenCode reported USD 0 in the official-grader-path smoke; calls consume ChatGPT subscription usage and may be rate limited.",
+    "separation": "The judge differs from the GPT-6 Astra answer reader.",
+    "superseded_plan": {
+      "model": "gpt-5.2",
+      "hard_budget_usd": 30,
+      "calls_made": 0,
+      "spend_usd": 0
+    }
+  },
+  "execution_order": [
+    "engram_off_web",
+    "conventional_rag_web",
+    "engram_on_web",
+    "engram_on_enterprise",
+    "conventional_rag_enterprise",
+    "engram_off_enterprise"
+  ],
+  "claim_boundary": "Official LongMemEval-V2 small-tier dataset, deterministic graders, and LLM-grader prompts with GPT-6 Astra as a fixed OpenCode/ChatGPT-OAuth answer reader and GPT-5.5 OAuth as a separate judge. Engram OFF/ON uses the same reader, questions, order and concurrency; only the memory method changes. RAG is a secondary comparator. The custom OAuth transports and judge model make this a separate frontier-reader replication, not an official leaderboard submission.",
+  "runtime_target": {
+    "target_hours": 5,
+    "planning_range_hours": [
+      5,
+      7
+    ],
+    "basis": "Astra concurrency-2 smokes, local index/retrieval timings, and a 9.84-second GPT-5.5 OAuth grader smoke; account throttling can extend wall time.",
+    "concurrency": 2
+  },
+  "status": "completed",
+  "completed_at": "2026-09-20",
+  "results": {
+    "report": "docs/longmemeval-v2-results.md",
+    "machine_readable": "benchmarks/scientific/longmemeval-v2-results.json",
+    "responses": 1353,
+    "deterministic_scores": 885,
+    "llm_judgments": 468,
+    "reported_api_cost_usd": 0,
+    "primary_objective": {
+      "engram_off_accuracy": 0.0,
+      "engram_on_accuracy": 0.2,
+      "paired_delta": 0.2,
+      "bootstrap_95_ci": [
+        0.15593220338983052,
+        0.24745762711864408
+      ],
+      "mcnemar_exact_two_sided_p": 3.469446951953614e-18
+    },
+    "secondary_rag_objective_accuracy": 0.3389830508474576
+  }
+}
