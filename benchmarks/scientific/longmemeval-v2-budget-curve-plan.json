@@ -1,0 +1,184 @@
+{
+  "schema_version": 1,
+  "benchmark": "LongMemEval-V2 budget curve diagnostic",
+  "status": "preregistered",
+  "preregistered_at": "2026-09-21",
+  "official_repository_commit": "2cc8c540bdb87fe6761629b585e727e1c4704520",
+  "dataset_revision": "f152293e235517d504809563c833d7190b8c713b",
+  "tier": "small",
+  "purpose": "Measure Engram and conventional RAG at identical memory-context budgets before changing retrieval.",
+  "classification": "Diagnostic development study on a frozen objective subset; not a confirmatory benchmark or official leaderboard submission.",
+  "selection": {
+    "seed": 20260921,
+    "rule": "For each domain, sort eligible ids and sample five with Python random.Random(seed) from each of static-environment, dynamic-environment, and procedure. Exclude every eval_function beginning with llm_.",
+    "questions_per_domain": 15,
+    "question_ids": {
+      "web": [
+        "0738c1ac",
+        "0c0fdcd7",
+        "36fe48ef",
+        "41bb40df",
+        "e4d36b58",
+        "07d86be1",
+        "5c826b28",
+        "820d56e2",
+        "8cb3280c",
+        "edea0219",
+        "18f9d965",
+        "2ca2d443",
+        "597645be",
+        "60c7ca22",
+        "674a6972"
+      ],
+      "enterprise": [
+        "1bfd2eac",
+        "634973c3",
+        "8b09f378",
+        "ad903be2",
+        "fe41b553",
+        "0d07143c",
+        "5edd2533",
+        "85fc5722",
+        "b8cabd09",
+        "dd53ab77",
+        "0b50ca0d",
+        "100ff132",
+        "4df5e6b4",
+        "d63e8a7f",
+        "eb3cfd03"
+      ]
+    },
+    "question_types": {
+      "static-environment": 5,
+      "dynamic-environment": 5,
+      "procedure": 5
+    },
+    "image_questions": 0,
+    "llm_judged_questions": 0
+  },
+  "conditions": {
+    "engram_on": "engram_runtime",
+    "conventional_rag": "rag_query_to_slice"
+  },
+  "memory_context_budgets_tokens": [
+    4096,
+    8192,
+    16384,
+    32768
+  ],
+  "reader": {
+    "model": "gpt-6-astra",
+    "reasoning_variant": "low",
+    "transport": "OpenCode CLI through ChatGPT OAuth",
+    "thinking": false,
+    "concurrency": 2,
+    "hidden_retries": 0
+  },
+  "rag": {
+    "embedding_model": "Qwen/Qwen3-Embedding-8B",
+    "controller_model": "qwen3.5-9b",
+    "execution": "local"
+  },
+  "primary_metrics": [
+    "deterministic accuracy",
+    "reader prompt tokens",
+    "correct answers per million reader prompt tokens"
+  ],
+  "secondary_metrics": [
+    "reader completion tokens",
+    "condition wall time",
+    "unknown rate",
+    "memory context tokens"
+  ],
+  "execution_order": [
+    {
+      "budget_tokens": 4096,
+      "method": "engram_runtime",
+      "domain": "web"
+    },
+    {
+      "budget_tokens": 4096,
+      "method": "rag_query_to_slice",
+      "domain": "web"
+    },
+    {
+      "budget_tokens": 4096,
+      "method": "rag_query_to_slice",
+      "domain": "enterprise"
+    },
+    {
+      "budget_tokens": 4096,
+      "method": "engram_runtime",
+      "domain": "enterprise"
+    },
+    {
+      "budget_tokens": 8192,
+      "method": "rag_query_to_slice",
+      "domain": "web"
+    },
+    {
+      "budget_tokens": 8192,
+      "method": "engram_runtime",
+      "domain": "web"
+    },
+    {
+      "budget_tokens": 8192,
+      "method": "engram_runtime",
+      "domain": "enterprise"
+    },
+    {
+      "budget_tokens": 8192,
+      "method": "rag_query_to_slice",
+      "domain": "enterprise"
+    },
+    {
+      "budget_tokens": 16384,
+      "method": "engram_runtime",
+      "domain": "web"
+    },
+    {
+      "budget_tokens": 16384,
+      "method": "rag_query_to_slice",
+      "domain": "web"
+    },
+    {
+      "budget_tokens": 16384,
+      "method": "rag_query_to_slice",
+      "domain": "enterprise"
+    },
+    {
+      "budget_tokens": 16384,
+      "method": "engram_runtime",
+      "domain": "enterprise"
+    },
+    {
+      "budget_tokens": 32768,
+      "method": "rag_query_to_slice",
+      "domain": "web"
+    },
+    {
+      "budget_tokens": 32768,
+      "method": "engram_runtime",
+      "domain": "web"
+    },
+    {
+      "budget_tokens": 32768,
+      "method": "engram_runtime",
+      "domain": "enterprise"
+    },
+    {
+      "budget_tokens": 32768,
+      "method": "rag_query_to_slice",
+      "domain": "enterprise"
+    }
+  ],
+  "expected": {
+    "runs": 16,
+    "responses": 240,
+    "responses_per_run": 15,
+    "paid_api_calls": 0,
+    "llm_judge_calls": 0
+  },
+  "decision_rule": "Engram is token-quality superior at a budget when its deterministic accuracy is at least RAG accuracy and its reader prompt-token total is no greater. The complete curve is reported even if no budget meets this rule.",
+  "claim_boundary": "One seeded 30-question diagnostic subset can guide retrieval engineering but cannot replace the completed 451-question study or establish general superiority."
+}
