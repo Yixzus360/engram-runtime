@@ -129,6 +129,21 @@ protocol, limits, and reproduction command; the
 [JSON result](../benchmarks/scientific/longmemeval-v2-results.json) is the
 machine-readable source.
 
+### Equal-budget development diagnostic
+
+A follow-up study froze 30 objectively graded questions before execution and
+compared Engram with RAG at identical 4k, 8k, 16k, and 32k memory-context
+caps. At 16k, Engram scored 8/30 (26.7%) versus 6/30 (20.0%) for RAG and used
+22.6% fewer observed reader prompt tokens. It was the only cap that met the
+preregistered token-quality rule.
+
+The paired interval still crossed zero, so this is an engineering diagnostic,
+not evidence of general or statistical superiority. The curve also showed that
+Engram stopped adding evidence above 8k while RAG continued gaining accuracy
+with larger context. The [equal-budget report](longmemeval-v2-budget-curve-results.md)
+and its [machine result](../benchmarks/scientific/longmemeval-v2-budget-curve-results.json)
+record the full curve and limitations.
+
 The wrapper refuses a LongMemEval-V2 checkout that does not match the pinned
 commit in the protocol. The complete official dataset revision totals about
 7.12 GB of downloads and 19.53 GB after preparation. The official small-tier

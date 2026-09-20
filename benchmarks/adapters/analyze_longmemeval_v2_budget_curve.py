@@ -132,12 +132,16 @@ def analyze(plan_path: Path, artifact_root: Path) -> dict[str, Any]:
             ),
         }
 
+    current_plan_sha256 = file_sha256(plan_path)
+    preregistration = plan.get("preregistration") or {}
     return {
         "schema_version": 1,
         "generated_at_utc": datetime.now(UTC).isoformat(),
         "benchmark": plan["benchmark"],
         "classification": plan["classification"],
-        "plan_sha256": file_sha256(plan_path),
+        "plan_sha256": current_plan_sha256,
+        "preregistered_plan_sha256": preregistration.get("plan_sha256", current_plan_sha256),
+        "preregistration_commit": preregistration.get("commit", "ba00b2b"),
         "validation": {
             "complete_runs": len(runs),
             "responses": total_rows,

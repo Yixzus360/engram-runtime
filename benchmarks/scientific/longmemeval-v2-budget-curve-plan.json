@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "benchmark": "LongMemEval-V2 budget curve diagnostic",
-  "status": "preregistered",
+  "status": "completed",
   "preregistered_at": "2026-09-21",
   "official_repository_commit": "2cc8c540bdb87fe6761629b585e727e1c4704520",
   "dataset_revision": "f152293e235517d504809563c833d7190b8c713b",
@@ -180,5 +180,23 @@
     "llm_judge_calls": 0
   },
   "decision_rule": "Engram is token-quality superior at a budget when its deterministic accuracy is at least RAG accuracy and its reader prompt-token total is no greater. The complete curve is reported even if no budget meets this rule.",
-  "claim_boundary": "One seeded 30-question diagnostic subset can guide retrieval engineering but cannot replace the completed 451-question study or establish general superiority."
+  "claim_boundary": "One seeded 30-question diagnostic subset can guide retrieval engineering but cannot replace the completed 451-question study or establish general superiority.",
+  "completed_at": "2026-09-21",
+  "preregistration": {
+    "commit": "ba00b2b",
+    "plan_sha256": "d6493bf090a17f911c1cb860b55d4489ff459e8e0abbd98de0dc60d699c62dd3"
+  },
+  "results": {
+    "report": "docs/longmemeval-v2-budget-curve-results.md",
+    "machine_readable": "benchmarks/scientific/longmemeval-v2-budget-curve-results.json",
+    "complete_runs": 16,
+    "responses": 240,
+    "objective_scores": 240,
+    "llm_judge_calls": 0,
+    "reported_api_cost_usd": 0.0,
+    "rule_met_at_budget_tokens": [
+      16384
+    ],
+    "headline": "Engram led RAG by 6.7 points at 16,384 tokens while using 22.6% fewer observed reader prompt tokens; the 30-question diagnostic is not statistically conclusive."
+  }
 }

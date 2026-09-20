@@ -214,6 +214,13 @@ five-model harness check is published separately as a clearly labeled
 The matching [`blind jury report`](benchmarks/scientific/latest-debate.md)
 keeps model critiques separate from the objective ON/OFF endpoint.
 
+A preregistered 30-question equal-budget diagnostic then compared Engram and
+RAG at 4k, 8k, 16k, and 32k memory caps. At 16k, Engram scored 26.7% versus
+20.0% for RAG while using 22.6% fewer observed reader prompt tokens. The small
+sample is diagnostic rather than statistically conclusive; its main finding is
+that current Engram retrieval plateaus above 8k. See the
+[`equal-budget curve`](docs/longmemeval-v2-budget-curve-results.md).
+
 ## Local stack
 
 - Python 3.12 and FastAPI for the runtime service.
